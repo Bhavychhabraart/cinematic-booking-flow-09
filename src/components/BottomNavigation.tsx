@@ -4,6 +4,11 @@ import { motion } from 'framer-motion';
 import { Book, Star, Users, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useParams, useNavigate } from 'react-router-dom';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type NavItem = {
   label: string;
@@ -58,19 +63,25 @@ const BottomNavigation = ({ activeSection, setActiveSection }: {
     >
       <div className="flex justify-around items-center h-16">
         {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => handleNav(item.id)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full h-full transition-all",
-              activeSection === item.id
-                ? "text-gold"
-                : "text-white/70 hover:text-white"
-            )}
-          >
-            {item.icon}
-            <span className="text-xs font-medium">{item.label}</span>
-          </button>
+          <Tooltip key={item.id}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => handleNav(item.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 w-full h-full transition-all",
+                  activeSection === item.id
+                    ? "text-gold"
+                    : "text-white/70 hover:text-white"
+                )}
+              >
+                {item.icon}
+                <span className="text-xs font-medium">{item.label}</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {item.id === 'bookings' ? 'Go to booking page' : `View ${item.label.toLowerCase()}`}
+            </TooltipContent>
+          </Tooltip>
         ))}
       </div>
     </motion.div>

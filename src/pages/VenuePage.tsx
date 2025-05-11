@@ -8,7 +8,6 @@ import { ArrowLeft, Users, Clock, Share, Heart, Star, Calendar, Eye } from 'luci
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/sonner";
@@ -226,42 +225,38 @@ const VenuePage = () => {
             <ArrowLeft size={20} />
           </Button>
           <div className="flex items-center space-x-3">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={handleWishlist}
-                    className="bg-black/40 text-white hover:bg-black/60 transition-colors"
-                  >
-                    <Heart 
-                      size={20} 
-                      className={isWishlisted ? "fill-red-500 text-red-500" : ""} 
-                    />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleWishlist}
+                  className="bg-black/40 text-white hover:bg-black/60 transition-colors"
+                >
+                  <Heart 
+                    size={20} 
+                    className={isWishlisted ? "fill-red-500 text-red-500" : ""} 
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              </TooltipContent>
+            </Tooltip>
             
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={handleShare}
-                    className="bg-black/40 text-white hover:bg-black/60 transition-colors"
-                  >
-                    <Share size={20} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Share this venue</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleShare}
+                  className="bg-black/40 text-white hover:bg-black/60 transition-colors"
+                >
+                  <Share size={20} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Share this venue</TooltipContent>
+            </Tooltip>
             
             <div className="w-16 h-16 bg-black/40 rounded-full flex items-center justify-center overflow-hidden">
               <img src={venue.logoUrl} alt={`${venue.name} logo`} className="w-10 h-10 object-contain" />
