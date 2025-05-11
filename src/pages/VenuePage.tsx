@@ -12,6 +12,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/sonner";
+import VenueShowcase from '@/components/VenueShowcase';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const VenuePage = () => {
   const { venueName } = useParams();
@@ -19,6 +21,7 @@ const VenuePage = () => {
   const venue = getVenueBySlug(venueName || '');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [viewCount, setViewCount] = useState(0);
+  const [activeSection, setActiveSection] = useState('menus');
   
   useEffect(() => {
     if (!venue) {
@@ -82,8 +85,139 @@ const VenuePage = () => {
   const availableSlots = Math.floor(Math.random() * 5) + 1;
   const popularTimeSlot = getRandomTimeSlot();
   
+  const renderSectionContent = () => {
+    switch (activeSection) {
+      case 'menus':
+        return (
+          <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-10">
+            <h3 className="text-xl font-medium mb-4 tracking-wide">Our Menu</h3>
+            <p className="text-white/70 mb-4">
+              Discover our chef-curated selection of dishes and drinks, made with the finest ingredients.
+            </p>
+            <VenueShowcase />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-3 border border-white/10 rounded-md">
+                <h4 className="font-medium text-gold mb-2">Signature Dishes</h4>
+                <ul className="space-y-2 text-sm text-white/70">
+                  <li className="flex justify-between">
+                    <span>Truffle Risotto</span>
+                    <span className="text-gold">$24</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Wagyu Steak</span>
+                    <span className="text-gold">$48</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Seafood Platter</span>
+                    <span className="text-gold">$36</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="p-3 border border-white/10 rounded-md">
+                <h4 className="font-medium text-gold mb-2">Specialty Drinks</h4>
+                <ul className="space-y-2 text-sm text-white/70">
+                  <li className="flex justify-between">
+                    <span>Golden Margarita</span>
+                    <span className="text-gold">$16</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Smoked Old Fashioned</span>
+                    <span className="text-gold">$18</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Signature Martini</span>
+                    <span className="text-gold">$14</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+      case 'experiences':
+        return (
+          <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-10">
+            <h3 className="text-xl font-medium mb-4 tracking-wide">Experiences</h3>
+            <p className="text-white/70 mb-4">
+              Unique experiences that make your visit memorable and special.
+            </p>
+            <VenueShowcase />
+            <div className="space-y-4">
+              <div className="p-3 border border-white/10 rounded-md relative">
+                <span className="absolute -right-2 -top-2 bg-gold text-black text-xs px-2 py-0.5 rounded-full shadow-md">
+                  Popular Choice
+                </span>
+                <h4 className="font-medium text-gold mb-2">VIP Package</h4>
+                <p className="text-sm text-white/70">
+                  Skip the line, get priority seating, and enjoy complimentary champagne.
+                </p>
+              </div>
+              <div className="p-3 border border-white/10 rounded-md">
+                <h4 className="font-medium text-gold mb-2">Chef's Table</h4>
+                <p className="text-sm text-white/70">
+                  An intimate dining experience with a personalized menu by our head chef.
+                </p>
+              </div>
+              <div className="p-3 border border-white/10 rounded-md relative">
+                <span className="absolute -right-2 -top-2 bg-gold text-black text-xs px-2 py-0.5 rounded-full shadow-md">
+                  Only 2 left!
+                </span>
+                <h4 className="font-medium text-gold mb-2">Mixology Class</h4>
+                <p className="text-sm text-white/70">
+                  Learn to craft our signature cocktails with our expert bartenders.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      case 'collabs':
+        return (
+          <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-10">
+            <h3 className="text-xl font-medium mb-4 tracking-wide">Collaborations</h3>
+            <p className="text-white/70 mb-4">
+              Special events and collaborations with artists, chefs, and brands.
+            </p>
+            <VenueShowcase />
+            <div className="space-y-4">
+              <div className="p-3 border border-white/10 rounded-md">
+                <h4 className="font-medium text-gold mb-2">Guest DJ Nights</h4>
+                <p className="text-sm text-white/70">
+                  Monthly events featuring renowned DJs from around the world.
+                </p>
+                <div className="mt-2 flex items-center text-xs text-white/60">
+                  <Calendar className="mr-1 h-3 w-3" />
+                  <span>Next event: This Friday</span>
+                </div>
+              </div>
+              <div className="p-3 border border-white/10 rounded-md">
+                <h4 className="font-medium text-gold mb-2">Pop-Up Kitchen</h4>
+                <p className="text-sm text-white/70">
+                  Collaborations with celebrity chefs bringing unique dining experiences.
+                </p>
+                <div className="mt-2 flex items-center text-xs text-white/60">
+                  <Users className="mr-1 h-3 w-3" />
+                  <span>6 people booked today</span>
+                </div>
+              </div>
+              <div className="p-3 border border-white/10 rounded-md">
+                <h4 className="font-medium text-gold mb-2">Art Exhibitions</h4>
+                <p className="text-sm text-white/70">
+                  Rotating gallery featuring local and international artists.
+                </p>
+                <div className="mt-2 flex items-center text-xs text-white/60">
+                  <Clock className="mr-1 h-3 w-3" />
+                  <span>Current exhibition ends in 3 days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+  
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-16">
       <div className="relative h-[70vh]">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         <img src={venue.imageUrl} alt={venue.name} className="absolute inset-0 w-full h-full object-cover" />
@@ -176,7 +310,7 @@ const VenuePage = () => {
         </p>
       </motion.div>
       
-      <div className="container-center py-16">
+      <div className="container-center py-10">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -196,6 +330,9 @@ const VenuePage = () => {
             {venue.description}
           </p>
         </motion.div>
+        
+        {/* Section Content */}
+        {renderSectionContent()}
         
         {/* Social Proof Section */}
         <motion.div
@@ -237,6 +374,9 @@ const VenuePage = () => {
           </div>
         </motion.div>
       </div>
+      
+      {/* Bottom Navigation */}
+      <BottomNavigation activeSection={activeSection} setActiveSection={setActiveSection} />
     </div>
   );
 };
