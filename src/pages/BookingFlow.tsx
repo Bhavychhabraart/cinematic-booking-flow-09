@@ -13,9 +13,11 @@ import BookingContact from '@/components/BookingContact';
 import BookingPreferences from '@/components/BookingPreferences';
 import BookingStepFour from '@/components/BookingStepFour';
 import BookingStepFive from '@/components/BookingStepFive';
-import { Users, Clock, CalendarCheck, Package, Star } from 'lucide-react';
+import { Users, Clock } from 'lucide-react';
 import { toast } from "@/components/ui/sonner";
 import { vibrate, vibrationPatterns, provideFeedback } from '@/utils/feedback';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Determine the maximum number of steps based on booking type
 const getMaxSteps = (bookingType: string): number => {
@@ -156,40 +158,18 @@ const BookingSteps = () => {
     return <BookingStepFive key="step5" />;
   };
 
-  // Determine which step icons to show based on booking type
-  const getStepIcons = () => {
+  // Get step names based on booking type
+  const getStepNames = () => {
     if (['lunch', 'dinner', 'vip_standing', 'vip_couch', 'private'].includes(booking.bookingType)) {
-      return [
-        { icon: <Users size={16} />, label: "Type" },
-        { icon: <Users size={16} />, label: "Guests" },
-        { icon: <CalendarCheck size={16} />, label: "Date" },
-        { icon: <Package size={16} />, label: "Add-ons" },
-        { icon: <Star size={16} />, label: "Experiences" },
-        { icon: <Users size={16} />, label: "Preferences" },
-        { icon: <Users size={16} />, label: "Contact" },
-        { icon: <Users size={16} />, label: "Confirm" }
-      ];
+      return ["Type", "Guests", "Date", "Add-ons", "Experiences", "Preferences", "Contact", "Confirm"];
     } else if (['guestlist', 'event'].includes(booking.bookingType)) {
-      return [
-        { icon: <Users size={16} />, label: "Type" },
-        { icon: <Users size={16} />, label: "Guests" },
-        { icon: <CalendarCheck size={16} />, label: "Date" },
-        { icon: <Users size={16} />, label: "Contact" },
-        { icon: <Users size={16} />, label: "Confirm" }
-      ];
+      return ["Type", "Guests", "Date", "Contact", "Confirm"];
     } else {
-      // Default
-      return [
-        { icon: <Users size={16} />, label: "Type" },
-        { icon: <Users size={16} />, label: "Guests" },
-        { icon: <CalendarCheck size={16} />, label: "Date" },
-        { icon: <Users size={16} />, label: "Review" },
-        { icon: <Users size={16} />, label: "Confirm" }
-      ];
+      return ["Type", "Guests", "Date", "Review", "Confirm"];
     }
   };
-  
-  const stepIcons = getStepIcons();
+
+  const stepNames = getStepNames();
   
   return (
     <div className="min-h-screen pt-20 my-0 px-0 py-[47px]">
@@ -222,41 +202,62 @@ const BookingSteps = () => {
           </motion.div>
         </div>
         
-        {/* Progress bar instead of dots for a more fluid experience */}
-        <div className="px-6 mb-6">
-          <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gold"
-              initial={{ width: '0%' }}
-              animate={{ width: `${progressPercentage}%` }}
-              transition={{ duration: 0.5 }}
+        {/* Clean, streamlined progress indicator */}
+        <div className="px-6 mb-8">
+          {/* Progress bar */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-2"
+          >
+            <Progress 
+              value={progressPercentage} 
+              className="h-1.5 bg-white/10" 
+              indicatorColor="bg-gold"
             />
-          </div>
+          </motion.div>
           
-          {/* Step labels */}
-          <div className="flex justify-between mt-2 text-xs">
-            {stepIcons.slice(0, maxSteps).map((step, index) => (
-              <motion.div 
-                key={index}
-                className={`flex flex-col items-center ${index === booking.step ? 'text-gold' : 'text-white/40'}`}
-                animate={index === booking.step ? { scale: [1, 1.2, 1] } : {}}
-                transition={{ repeat: 0, duration: 0.3 }}
-              >
-                <div 
-                  className={`flex items-center justify-center w-6 h-6 rounded-full mb-1 ${
-                    index === booking.step 
-                      ? 'bg-gold/20' 
-                      : index < booking.step 
-                        ? 'bg-gold/10' 
-                        : 'bg-white/5'
-                  }`}
+          {/* Current step name indicator */}
+          <motion.div 
+            className="flex justify-between items-center mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="text-xs text-white/60">
+              Step {booking.step + 1} of {maxSteps}
+            </div>
+            <div className="text-sm font-medium text-gold">
+              {stepNames[booking.step]}
+            </div>
+          </motion.div>
+          
+          {/* Tab indicators for steps */}
+          <Tabs value={booking.step.toString()} className="mt-4">
+            <TabsList className="bg-transparent w-full flex justify-between p-0 h-auto">
+              {stepNames.slice(0, maxSteps).map((_, index) => (
+                <TabsTrigger
+                  key={index}
+                  value={index.toString()}
+                  className="p-0 w-full data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                  disabled
                 >
-                  {step.icon}
-                </div>
-                <span className="text-[10px]">{step.label}</span>
-              </motion.div>
-            ))}
-          </div>
+                  <motion.div
+                    className={`h-1.5 w-full rounded-full transition-colors ${
+                      index < booking.step 
+                        ? 'bg-gold/60' 
+                        : index === booking.step 
+                          ? 'bg-gold' 
+                          : 'bg-white/10'
+                    }`}
+                    initial={{ opacity: 0.6 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.1 * index }}
+                  />
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
       </div>
       
