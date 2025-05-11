@@ -24,7 +24,7 @@ const BookingSteps = () => {
   }, [venue, navigate]);
   if (!venue) return null;
   const steps = [<BookingStepOne key="step1" />, <BookingStepTwo key="step2" />, <BookingStepThree key="step3" />, <BookingStepFour key="step4" />, <BookingStepFive key="step5" />];
-  return <div className="min-h-screen pt-20">
+  return <div className="min-h-screen pt-20 my-0 px-0 py-[47px]">
       <div className="container-center mb-10">
         <div className="text-center mb-12">
           <h1 className="font-medium tracking-widest text-4xl">{venue.name}</h1>
