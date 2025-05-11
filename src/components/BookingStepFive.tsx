@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useBooking } from '@/context/BookingContext';
 import { format } from 'date-fns';
 import { toast } from "@/components/ui/sonner";
+import { vibrate, vibrationPatterns, playSound, sounds } from '@/utils/feedback';
 
 const generateQR = (data: string) => {
   // Mock function to "generate" a QR code
@@ -104,6 +105,10 @@ const BookingStepFive: React.FC = () => {
   };
   
   useEffect(() => {
+    // Play victory sound and vibration when component mounts
+    playSound(sounds.victory);
+    vibrate(vibrationPatterns.success);
+    
     const intervalId = setInterval(() => {
       setBubbles(prev => [...prev, Date.now()]);
     }, 300);
@@ -117,11 +122,17 @@ const BookingStepFive: React.FC = () => {
   }, [booking, venueName]);
   
   const handleDownloadQR = () => {
+    // Add haptic feedback
+    vibrate(vibrationPatterns.buttonPress);
+    
     // In a real application, you would generate and download an actual QR code
     toast.success("Booking QR code saved to your device");
   };
   
   const handleDone = () => {
+    // Add haptic feedback
+    vibrate(vibrationPatterns.buttonPress);
+    
     resetBooking();
     navigate(`/venues/${venueName}`);
   };

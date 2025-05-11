@@ -11,13 +11,14 @@ import BookingStepFour from '@/components/BookingStepFour';
 import BookingStepFive from '@/components/BookingStepFive';
 import { Users, Clock } from 'lucide-react';
 import { toast } from "@/components/ui/sonner";
+import { vibrate, vibrationPatterns } from '@/utils/feedback';
 
 const BookingSteps = () => {
   const { booking } = useBooking();
   const { venueName } = useParams();
   const navigate = useNavigate();
   const venue = getVenueBySlug(venueName || '');
-  const [activeUsers, setActiveUsers] = useState(Math.floor(Math.random() * 8) + 3);
+  const [activeUsers, setActiveUsers] = useState(Math.floor(Math.random() * 5) + 2); // Reduced number
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
   
   useEffect(() => {
@@ -25,30 +26,25 @@ const BookingSteps = () => {
       navigate('/');
     }
     
-    // Show occasional toast notifications for FOMO
+    // Show occasional toast notifications for FOMO - reduced frequency and intensity
     const notificationInterval = setInterval(() => {
-      const notifications = [
-        { message: "Someone just booked this venue!", delay: 15000 },
-        { message: `Only ${Math.floor(Math.random() * 3) + 1} slots left for tonight!`, delay: 30000 },
-        { message: `${Math.floor(Math.random() * 3) + 2} people just viewed this booking!`, delay: 45000 },
-      ];
-      
-      const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
-      
-      setTimeout(() => {
-        toast(randomNotification.message, {
-          duration: 5000,
+      // Only show one type of notification with longer intervals
+      if (Math.random() > 0.7) { // 30% chance to show notification
+        const message = `${Math.floor(Math.random() * 2) + 1} new bookings in the last hour`;
+        
+        toast(message, {
+          duration: 3000,
         });
-      }, randomNotification.delay);
-    }, 60000); // Show a notification roughly every minute
+      }
+    }, 120000); // Show a notification roughly every 2 minutes instead of every minute
     
-    // Simulate other active users
+    // Simulate other active users - less frequent updates
     const userInterval = setInterval(() => {
       setActiveUsers(prev => {
-        const change = Math.random() > 0.5 ? 1 : -1;
-        return Math.max(2, prev + change);
+        const change = Math.random() > 0.7 ? 1 : -1;
+        return Math.max(1, prev + change);
       });
-    }, 45000);
+    }, 60000); // Update every minute instead of every 45 seconds
     
     // Countdown timer
     const timerInterval = setInterval(() => {
@@ -59,6 +55,7 @@ const BookingSteps = () => {
             description: "We've extended your time by 10 minutes.",
             duration: 5000,
           });
+          vibrate(vibrationPatterns.warning);
           return 600; // Reset to 10 minutes
         }
         return prev - 1;
@@ -96,26 +93,26 @@ const BookingSteps = () => {
           <p className="text-white/60 font-light text-lg">Booking Experience</p>
         </div>
         
-        {/* FOMO indicators */}
-        <div className="flex justify-between items-center mb-4 px-6 text-xs">
+        {/* FOMO indicators - more subtle placement */}
+        <div className="flex justify-between items-center mb-4 px-6 text-xs opacity-70">
           <motion.div 
-            className="flex items-center text-gold"
+            className="flex items-center text-white/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
             <Users className="mr-1 h-4 w-4" />
-            <span>{activeUsers} people booking right now</span>
+            <span>{activeUsers} people booking</span>
           </motion.div>
           
           <motion.div 
-            className={`flex items-center ${timeLeft < 120 ? 'text-red-400' : 'text-gold'}`}
+            className={`flex items-center ${timeLeft < 120 ? 'text-gold/70' : 'text-white/60'}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
             <Clock className="mr-1 h-4 w-4" />
-            <span>Session expires in {formatTime(timeLeft)}</span>
+            <span>Session: {formatTime(timeLeft)}</span>
           </motion.div>
         </div>
         
@@ -126,7 +123,7 @@ const BookingSteps = () => {
               <motion.div 
                 className={`w-3 h-3 rounded-full mb-1 ${
                   step === booking.step 
-                    ? 'bg-gold animate-pulse-gold' 
+                    ? 'bg-gold' 
                     : step < booking.step 
                       ? 'bg-gold/80' 
                       : 'bg-white/20'
@@ -151,6 +148,11 @@ const BookingSteps = () => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -100 }}
           transition={{ duration: 0.5 }}
+          onAnimationComplete={() => {
+            if (booking.step > 0) {
+              vibrate(vibrationPatterns.subtle);
+            }
+          }}
         >
           {steps[booking.step]}
         </motion.div>

@@ -9,6 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { vibrate, vibrationPatterns } from '@/utils/feedback';
 
 type NavItem = {
   label: string;
@@ -47,6 +48,9 @@ const BottomNavigation = ({ activeSection, setActiveSection }: {
   ];
 
   const handleNav = (id: string) => {
+    // Add subtle vibration feedback
+    vibrate(vibrationPatterns.navigation);
+    
     if (id === 'bookings') {
       navigate(`/book/${venueName}`);
     } else {

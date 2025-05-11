@@ -6,6 +6,7 @@ import { Utensils, Users, Ticket, Star, Share } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { getVenueBySlug } from '@/data/venues';
 import { toast } from "@/components/ui/sonner";
+import { vibrate, vibrationPatterns } from '@/utils/feedback';
 
 const BookingStepOne: React.FC = () => {
   const { setBookingType, nextStep } = useBooking();
@@ -13,11 +14,14 @@ const BookingStepOne: React.FC = () => {
   const venue = getVenueBySlug(venueName || '');
   
   const handleSelectType = (type: string) => {
+    vibrate(vibrationPatterns.buttonPress);
     setBookingType(type);
     nextStep();
   };
   
   const handleShareBooking = () => {
+    vibrate(vibrationPatterns.subtle);
+    
     if (navigator.share) {
       navigator.share({
         title: `I'm booking ${venue?.name} on VenueFusion!`,
@@ -39,44 +43,44 @@ const BookingStepOne: React.FC = () => {
       id: 'lunch',
       label: 'Lunch Table',
       icon: <Utensils className="mr-2" size={18} />,
-      social: 'Perfect for business meetings',
+      social: null,
     },
     {
       id: 'dinner',
       label: 'Dinner Table',
       icon: <Utensils className="mr-2" size={18} />,
-      social: 'Our most popular option',
+      social: 'Popular choice',
     },
     {
       id: 'guestlist',
       label: 'Guest List Entry',
       description: 'Couples & Female Stags - 3 drinks included',
       icon: <Users className="mr-2" size={18} />,
-      social: 'Skip the line with friends',
+      social: null,
     },
     {
       id: 'vip_standing',
       label: 'VIP Standing Table',
       icon: <Star className="mr-2" size={18} />,
-      social: 'Limited availability tonight',
+      social: null,
     },
     {
       id: 'vip_couch',
       label: 'VIP Couch Table',
       icon: <Star className="mr-2" size={18} />,
-      social: 'Only 2 left for tonight!',
+      social: 'Limited availability',
     },
     {
       id: 'event',
       label: 'Event Tickets',
       icon: <Ticket className="mr-2" size={18} />,
-      social: '85% booked for upcoming events',
+      social: null,
     },
     {
       id: 'private',
       label: 'Private Event Hosting',
       icon: <Users className="mr-2" size={18} />,
-      social: 'Book early, high demand',
+      social: null,
     },
   ];
 
@@ -126,6 +130,7 @@ const BookingStepOne: React.FC = () => {
               <span>{option.label}</span>
             </motion.button>
             
+            {/* Only show social proof on select items */}
             {option.social && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
