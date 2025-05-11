@@ -8,6 +8,8 @@ interface BookingState {
   date: Date | null;
   time: string;
   completed: boolean;
+  addOns: string[];
+  specialRequests: string;
 }
 
 interface BookingContextType {
@@ -16,6 +18,9 @@ interface BookingContextType {
   setGuestCount: (count: number) => void;
   setDate: (date: Date) => void;
   setTime: (time: string) => void;
+  addAddon: (addon: string) => void;
+  removeAddon: (addon: string) => void;
+  setSpecialRequests: (requests: string) => void;
   nextStep: () => void;
   prevStep: () => void;
   resetBooking: () => void;
@@ -31,7 +36,9 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     guestCount: 1,
     date: null,
     time: '',
-    completed: false
+    completed: false,
+    addOns: [],
+    specialRequests: '',
   });
 
   const setBookingType = (type: string) => {
@@ -50,6 +57,27 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     setBooking(prev => ({ ...prev, time }));
   };
 
+  const addAddon = (addon: string) => {
+    setBooking(prev => ({
+      ...prev,
+      addOns: [...prev.addOns, addon]
+    }));
+  };
+
+  const removeAddon = (addon: string) => {
+    setBooking(prev => ({
+      ...prev,
+      addOns: prev.addOns.filter(item => item !== addon)
+    }));
+  };
+
+  const setSpecialRequests = (requests: string) => {
+    setBooking(prev => ({
+      ...prev,
+      specialRequests: requests
+    }));
+  };
+
   const nextStep = () => {
     setBooking(prev => ({ ...prev, step: prev.step + 1 }));
   };
@@ -65,7 +93,9 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       guestCount: 1,
       date: null,
       time: '',
-      completed: false
+      completed: false,
+      addOns: [],
+      specialRequests: '',
     });
   };
 
@@ -80,6 +110,9 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       setGuestCount,
       setDate,
       setTime,
+      addAddon,
+      removeAddon,
+      setSpecialRequests,
       nextStep,
       prevStep,
       resetBooking,

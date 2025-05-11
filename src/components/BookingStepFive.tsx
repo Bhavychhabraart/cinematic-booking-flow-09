@@ -1,11 +1,65 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBooking } from '@/context/BookingContext';
 import { format } from 'date-fns';
+import { toast } from "@/components/ui/sonner";
+
+const generateQR = (data: string) => {
+  // Mock function to "generate" a QR code
+  // In a real application, you would use a library like qrcode.react
+  const size = 200;
+  const qrCodeSize = 10;
+  const qrData = [];
+  
+  // Simple algorithm to create a QR-like pattern based on the data string
+  for (let i = 0; i < qrCodeSize; i++) {
+    const row = [];
+    for (let j = 0; j < qrCodeSize; j++) {
+      // Use the characters from the data to determine if a cell is filled
+      const charIndex = (i * qrCodeSize + j) % data.length;
+      const charCode = data.charCodeAt(charIndex);
+      row.push(charCode % 2 === 0);
+    }
+    qrData.push(row);
+  }
+  
+  // Fixed patterns for QR code corners
+  // Top-left corner pattern
+  qrData[0][0] = true;
+  qrData[0][1] = true;
+  qrData[0][2] = true;
+  qrData[1][0] = true;
+  qrData[1][2] = true;
+  qrData[2][0] = true;
+  qrData[2][1] = true;
+  qrData[2][2] = true;
+  
+  // Top-right corner pattern
+  qrData[0][qrCodeSize-3] = true;
+  qrData[0][qrCodeSize-2] = true;
+  qrData[0][qrCodeSize-1] = true;
+  qrData[1][qrCodeSize-3] = true;
+  qrData[1][qrCodeSize-1] = true;
+  qrData[2][qrCodeSize-3] = true;
+  qrData[2][qrCodeSize-2] = true;
+  qrData[2][qrCodeSize-1] = true;
+  
+  // Bottom-left corner pattern
+  qrData[qrCodeSize-3][0] = true;
+  qrData[qrCodeSize-3][1] = true;
+  qrData[qrCodeSize-3][2] = true;
+  qrData[qrCodeSize-2][0] = true;
+  qrData[qrCodeSize-2][2] = true;
+  qrData[qrCodeSize-1][0] = true;
+  qrData[qrCodeSize-1][1] = true;
+  qrData[qrCodeSize-1][2] = true;
+
+  return { qrData, size, cellSize: size / qrCodeSize };
+};
 
 const Bubble = ({ delay }: { delay: number }) => {
   const xPos = Math.random() * 100;
@@ -33,14 +87,39 @@ const BookingStepFive: React.FC = () => {
   const { venueName } = useParams();
   const { booking, resetBooking } = useBooking();
   const [bubbles, setBubbles] = useState<number[]>([]);
+  const [qrCode, setQrCode] = useState<{ qrData: boolean[][]; size: number; cellSize: number } | null>(null);
+  
+  const getBookingTypeLabel = (type: string) => {
+    const types: Record<string, string> = {
+      lunch: "Lunch Table",
+      dinner: "Dinner Table",
+      guestlist: "Guest List Entry",
+      vip_standing: "VIP Standing Table",
+      vip_couch: "VIP Couch Table",
+      event: "Event Tickets",
+      private: "Private Event",
+      daypass: "Day Pass"
+    };
+    return types[type] || type;
+  };
   
   useEffect(() => {
     const intervalId = setInterval(() => {
       setBubbles(prev => [...prev, Date.now()]);
     }, 300);
     
+    if (booking.date && booking.time) {
+      const bookingData = `BOOKING:${venueName}:${booking.bookingType}:${format(booking.date, 'yyyyMMdd')}:${booking.time}:${booking.guestCount}:${Date.now().toString(36)}`;
+      setQrCode(generateQR(bookingData));
+    }
+    
     return () => clearInterval(intervalId);
-  }, []);
+  }, [booking, venueName]);
+  
+  const handleDownloadQR = () => {
+    // In a real application, you would generate and download an actual QR code
+    toast.success("Booking QR code saved to your device");
+  };
   
   const handleDone = () => {
     resetBooking();
@@ -52,7 +131,7 @@ const BookingStepFive: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="container-center text-center py-16 relative overflow-hidden"
+      className="container-center text-center py-8 relative overflow-hidden"
     >
       <motion.div
         initial={{ scale: 0 }}
@@ -63,16 +142,16 @@ const BookingStepFive: React.FC = () => {
           damping: 20,
           delay: 0.2
         }}
-        className="mb-8 flex justify-center"
+        className="mb-6 flex justify-center"
       >
-        <CheckCircle size={80} className="text-gold" />
+        <CheckCircle size={60} className="text-gold" />
       </motion.div>
       
       <motion.h2 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="mb-6 tracking-widest"
+        className="mb-4 tracking-widest"
       >
         Booking Confirmed!
       </motion.h2>
@@ -81,20 +160,74 @@ const BookingStepFive: React.FC = () => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="mb-12 max-w-xs mx-auto"
+        className="mb-6 max-w-xs mx-auto"
       >
-        <p className="text-white/80 mb-4">
-          Your {booking.bookingType} for {booking.guestCount} {booking.guestCount === 1 ? 'person' : 'people'} on {booking.date ? format(booking.date, 'MMMM d') : ''} at {booking.time} has been confirmed.
-        </p>
-        <p className="text-white/60 text-sm">
-          A confirmation email with your booking details has been sent to your email address.
+        <p className="text-white/80 mb-2">
+          Your {getBookingTypeLabel(booking.bookingType)} for {booking.guestCount} {booking.guestCount === 1 ? 'person' : 'people'} on {booking.date ? format(booking.date, 'MMMM d') : ''} at {booking.time} has been confirmed.
         </p>
       </motion.div>
+      
+      {/* QR Code */}
+      {qrCode && (
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="mb-6 flex flex-col items-center"
+        >
+          <div className="bg-white p-4 rounded-lg mb-2 mx-auto">
+            <div 
+              className="relative" 
+              style={{ 
+                width: qrCode.size, 
+                height: qrCode.size,
+                backgroundColor: "white",
+              }}
+            >
+              {qrCode.qrData.map((row, i) => 
+                row.map((cell, j) => 
+                  cell && (
+                    <div 
+                      key={`${i}-${j}`} 
+                      style={{
+                        position: 'absolute',
+                        left: j * qrCode.cellSize,
+                        top: i * qrCode.cellSize,
+                        width: qrCode.cellSize,
+                        height: qrCode.cellSize,
+                        backgroundColor: 'black',
+                      }}
+                    />
+                  )
+                )
+              )}
+            </div>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-gold border-gold/50 hover:bg-gold/5"
+            onClick={handleDownloadQR}
+          >
+            <Download size={16} className="mr-1" />
+            Download QR Code
+          </Button>
+        </motion.div>
+      )}
+      
+      <motion.p
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 1.4 }}
+        className="text-white/60 text-sm mb-8"
+      >
+        A confirmation email with your booking details has been sent to your email address.
+      </motion.p>
       
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 1 }}
+        transition={{ delay: 1.6 }}
       >
         <Button onClick={handleDone} className="booking-button">
           Done
