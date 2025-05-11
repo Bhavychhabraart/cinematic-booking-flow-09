@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 7%;
 
-    --primary: 47 100% 50%;
+    --primary: 21 76% 31%; /* Changed from 47 100% 50% (yellow gold) to 21 76% 31% (burnt orange) */
     --primary-foreground: 0 0% 7%;
 
     --secondary: 0 0% 96%;
@@ -25,7 +25,7 @@
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 0 0% 96%;
+    --accent: 21 76% 31%; /* Changed from 0 0% 96% to burnt orange */
     --accent-foreground: 0 0% 7%;
 
     --destructive: 0 85% 60%;
@@ -48,7 +48,7 @@
     --popover: 0 0% 7%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 47 100% 50%;
+    --primary: 21 76% 31%; /* Changed from 47 100% 50% (yellow gold) to 21 76% 31% (burnt orange) */
     --primary-foreground: 0 0% 7%;
 
     --secondary: 0 0% 15%;
@@ -57,7 +57,7 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 0 0% 15%;
+    --accent: 21 76% 31%; /* Changed from 0 0% 15.9% to burnt orange */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 85% 60%;
@@ -97,11 +97,11 @@
 
 @layer components {
   .booking-pill {
-    @apply px-6 py-3 rounded-full bg-transparent border border-gold text-white hover:bg-gold hover:text-dark transition-all duration-300 font-medium tracking-wide text-center;
+    @apply px-6 py-3 rounded-full bg-transparent border border-burntOrange text-white hover:bg-burntOrange hover:text-dark transition-all duration-300 font-medium tracking-wide text-center;
   }
   
   .booking-button {
-    @apply px-8 py-3 bg-gold text-dark rounded-sm hover:translate-y-[-1px] transition-all duration-200 font-medium tracking-wider uppercase;
+    @apply px-8 py-3 bg-burntOrange text-dark rounded-sm hover:translate-y-[-1px] transition-all duration-200 font-medium tracking-wider uppercase;
   }
   
   .container-center {

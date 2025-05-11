@@ -57,7 +57,8 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				gold: '#FFD700',
+				gold: '#914110', // Changed from #FFD700 to burnt orange
+				burntOrange: '#914110', // Added burnt orange color
 				dark: '#111111',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -113,8 +114,8 @@ export default {
 					'100%': { opacity: '1' }
 				},
 				'pulse-gold': {
-					'0%, 100%': { boxShadow: '0 0 0 0 rgba(255, 215, 0, 0.4)' },
-					'50%': { boxShadow: '0 0 0 10px rgba(255, 215, 0, 0)' }
+					'0%, 100%': { boxShadow: '0 0 0 0 rgba(145, 65, 16, 0.4)' }, // Updated to burnt orange
+					'50%': { boxShadow: '0 0 0 10px rgba(145, 65, 16, 0)' } // Updated to burnt orange
 				},
 				'float-up': {
 					'0%': { transform: 'translateY(0)', opacity: '1' },
