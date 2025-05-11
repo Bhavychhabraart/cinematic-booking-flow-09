@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { venues } from '@/data/venues';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
@@ -194,7 +194,7 @@ const AdminDashboard = () => {
                     <div key={venue.id} className="flex-1 mx-1 flex flex-col items-center">
                       <div className="w-full bg-white/10 rounded-sm" style={{ height: `${30 + Math.random() * 50}%` }}>
                         <div className="w-full bg-gold/80 h-full rounded-sm origin-bottom transform scale-y-0 animate-[grow_1s_ease-out_forwards]" style={{ animationDelay: `${0.3 + idx * 0.1}s` }}>
-                          <style jsx>{`
+                          <style>{`
                             @keyframes grow {
                               from { transform: scaleY(0); }
                               to { transform: scaleY(1); }
