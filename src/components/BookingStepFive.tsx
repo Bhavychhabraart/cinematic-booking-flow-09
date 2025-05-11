@@ -1,13 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Download } from 'lucide-react';
+import { CheckCircle, Download, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBooking } from '@/context/BookingContext';
 import { format } from 'date-fns';
 import { toast } from "@/components/ui/sonner";
 import { vibrate, vibrationPatterns, playSound, sounds } from '@/utils/feedback';
+import { formatCurrency } from '@/utils/formatters';
 
 const generateQR = (data: string) => {
   // Mock function to "generate" a QR code
@@ -86,9 +87,11 @@ const Bubble = ({ delay }: { delay: number }) => {
 const BookingStepFive: React.FC = () => {
   const navigate = useNavigate();
   const { venueName } = useParams();
-  const { booking, resetBooking } = useBooking();
+  const { booking, resetBooking, getPriceBreakdown } = useBooking();
   const [bubbles, setBubbles] = useState<number[]>([]);
   const [qrCode, setQrCode] = useState<{ qrData: boolean[][]; size: number; cellSize: number } | null>(null);
+  
+  const { total, appliedCoupon } = getPriceBreakdown();
   
   const getBookingTypeLabel = (type: string) => {
     const types: Record<string, string> = {
@@ -155,7 +158,7 @@ const BookingStepFive: React.FC = () => {
         }}
         className="mb-6 flex justify-center"
       >
-        <CheckCircle size={60} className="text-gold" />
+        <CheckCircle size={60} className="text-[#914110]" />
       </motion.div>
       
       <motion.h2 
@@ -176,6 +179,23 @@ const BookingStepFive: React.FC = () => {
         <p className="text-white/80 mb-2">
           Your {getBookingTypeLabel(booking.bookingType)} for {booking.guestCount} {booking.guestCount === 1 ? 'person' : 'people'} on {booking.date ? format(booking.date, 'MMMM d') : ''} at {booking.time} has been confirmed.
         </p>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0 }}
+          className="flex items-center justify-center mt-4 mb-2"
+        >
+          <Receipt className="h-4 w-4 mr-1 text-[#914110]" />
+          <span className="text-lg font-medium">{formatCurrency(total)}</span>
+          {appliedCoupon && (
+            <span className="ml-2 text-xs bg-[#914110]/10 text-[#914110] px-2 py-0.5 rounded-full">
+              {appliedCoupon.discountType === 'percentage' 
+                ? `${appliedCoupon.discountValue}% OFF` 
+                : `${formatCurrency(appliedCoupon.discountValue)} OFF`}
+            </span>
+          )}
+        </motion.div>
       </motion.div>
       
       {/* QR Code */}
@@ -217,7 +237,7 @@ const BookingStepFive: React.FC = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            className="text-gold border-gold/50 hover:bg-gold/5"
+            className="text-[#914110] border-[#914110]/50 hover:bg-[#914110]/5"
             onClick={handleDownloadQR}
           >
             <Download size={16} className="mr-1" />

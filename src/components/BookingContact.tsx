@@ -21,6 +21,7 @@ import { provideFeedback } from '@/utils/feedback';
 import { useParams } from 'react-router-dom';
 import { getVenueBySlug } from '@/data/venues';
 import { format } from "date-fns";
+import BookingSummary from '@/components/BookingSummary';
 
 // Form validation schema
 const formSchema = z.object({
@@ -75,32 +76,37 @@ const BookingContact: React.FC = () => {
     >
       <h2 className="text-center mb-6 tracking-widest">Almost There!</h2>
       
-      {/* Booking summary */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white/5 p-4 rounded-lg border border-white/10 mb-6 mx-4"
-      >
-        <div className="flex items-start">
-          <CalendarCheck className="text-gold mr-3 mt-1 h-5 w-5" />
-          <div>
-            <h3 className="font-medium">{venue?.name}</h3>
-            <p className="text-sm text-white/70">{booking.bookingType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Reservation</p>
-            <p className="text-sm text-white/70">
-              {booking.date ? format(booking.date, 'EEEE, MMMM d, yyyy') : ''} • {booking.time} 
-              • {booking.guestCount} {booking.guestCount === 1 ? 'guest' : 'guests'}
-            </p>
-            {(booking.addOns.length > 0 || booking.selectedExperiences.length > 0) && (
-              <p className="text-xs text-gold mt-1">
-                {booking.addOns.length > 0 && `${booking.addOns.length} add-on${booking.addOns.length !== 1 ? 's' : ''}`}
-                {booking.addOns.length > 0 && booking.selectedExperiences.length > 0 && ' • '}
-                {booking.selectedExperiences.length > 0 && `${booking.selectedExperiences.length} experience${booking.selectedExperiences.length !== 1 ? 's' : ''}`}
+      <div className="px-4 mb-6">
+        {/* Booking summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white/5 p-4 rounded-lg border border-white/10 mb-6"
+        >
+          <div className="flex items-start">
+            <CalendarCheck className="text-[#914110] mr-3 mt-1 h-5 w-5" />
+            <div>
+              <h3 className="font-medium">{venue?.name}</h3>
+              <p className="text-sm text-white/70">{booking.bookingType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Reservation</p>
+              <p className="text-sm text-white/70">
+                {booking.date ? format(booking.date, 'EEEE, MMMM d, yyyy') : ''} • {booking.time} 
+                • {booking.guestCount} {booking.guestCount === 1 ? 'guest' : 'guests'}
               </p>
-            )}
+              {(booking.addOns.length > 0 || booking.selectedExperiences.length > 0) && (
+                <p className="text-xs text-[#914110] mt-1">
+                  {booking.addOns.length > 0 && `${booking.addOns.length} add-on${booking.addOns.length !== 1 ? 's' : ''}`}
+                  {booking.addOns.length > 0 && booking.selectedExperiences.length > 0 && ' • '}
+                  {booking.selectedExperiences.length > 0 && `${booking.selectedExperiences.length} experience${booking.selectedExperiences.length !== 1 ? 's' : ''}`}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+        
+        {/* Price Summary */}
+        <BookingSummary />
+      </div>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 px-4">

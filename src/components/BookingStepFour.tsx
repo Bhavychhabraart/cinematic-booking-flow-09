@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import BookingSummary from '@/components/BookingSummary';
+import { provideFeedback } from '@/utils/feedback';
 
 const BookingStepFour: React.FC = () => {
   const { booking, nextStep, prevStep, completeBooking } = useBooking();
@@ -17,6 +19,7 @@ const BookingStepFour: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
+    provideFeedback('confirm');
     
     // Simulate payment processing
     setTimeout(() => {
@@ -36,6 +39,9 @@ const BookingStepFour: React.FC = () => {
       formattedValue += value[i];
     }
     setCardNumber(formattedValue);
+    if (formattedValue.length % 5 === 0) {
+      provideFeedback('subtle');
+    }
   };
   
   // Format expiry date as MM/YY
@@ -56,112 +62,129 @@ const BookingStepFour: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="container-center py-10"
     >
-      <h2 className="text-center mb-12 tracking-widest">Complete Your Booking</h2>
+      <h2 className="text-center mb-8 tracking-widest">Complete Your Booking</h2>
       
-      <motion.div 
-        className="mb-8 p-4 border border-gold/20 rounded-sm"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <h3 className="font-medium text-lg tracking-wide mb-4">Booking Summary</h3>
-        <div className="space-y-2 text-sm">
-          <p className="flex justify-between">
-            <span className="text-white/70">Type:</span>
-            <span className="font-medium">{booking.bookingType}</span>
-          </p>
-          <p className="flex justify-between">
-            <span className="text-white/70">Guests:</span>
-            <span className="font-medium">{booking.guestCount} {booking.guestCount === 1 ? 'person' : 'people'}</span>
-          </p>
-          <p className="flex justify-between">
-            <span className="text-white/70">Date:</span>
-            <span className="font-medium">{booking.date ? format(booking.date, 'MMMM d, yyyy') : ''}</span>
-          </p>
-          <p className="flex justify-between">
-            <span className="text-white/70">Time:</span>
-            <span className="font-medium">{booking.time}</span>
-          </p>
-        </div>
-      </motion.div>
-      
-      <motion.form 
-        onSubmit={handleSubmit}
-        className="space-y-5"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div className="space-y-2">
-          <label className="text-sm text-white/70 tracking-wide">Card Number</label>
-          <Input
-            type="text"
-            value={cardNumber}
-            onChange={handleCardNumberChange}
-            placeholder="1234 5678 9012 3456"
-            className="bg-transparent border-white/20 focus:border-gold transition-colors"
-            required
-          />
-        </div>
+      <div className="px-4">
+        {/* New BookingSummary component */}
+        <BookingSummary />
         
-        <div className="space-y-2">
-          <label className="text-sm text-white/70 tracking-wide">Cardholder Name</label>
-          <Input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="John Doe"
-            className="bg-transparent border-white/20 focus:border-gold transition-colors"
-            required
-          />
-        </div>
+        <motion.div 
+          className="mb-8 p-4 border border-white/10 rounded-lg"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <h3 className="font-medium text-lg tracking-wide mb-4">Booking Details</h3>
+          <div className="space-y-2 text-sm">
+            <p className="flex justify-between">
+              <span className="text-white/70">Type:</span>
+              <span className="font-medium">{booking.bookingType.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+            </p>
+            <p className="flex justify-between">
+              <span className="text-white/70">Guests:</span>
+              <span className="font-medium">{booking.guestCount} {booking.guestCount === 1 ? 'person' : 'people'}</span>
+            </p>
+            <p className="flex justify-between">
+              <span className="text-white/70">Date:</span>
+              <span className="font-medium">{booking.date ? format(booking.date, 'MMMM d, yyyy') : ''}</span>
+            </p>
+            <p className="flex justify-between">
+              <span className="text-white/70">Time:</span>
+              <span className="font-medium">{booking.time}</span>
+            </p>
+          </div>
+        </motion.div>
         
-        <div className="grid grid-cols-2 gap-4">
+        <motion.form 
+          onSubmit={handleSubmit}
+          className="space-y-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
           <div className="space-y-2">
-            <label className="text-sm text-white/70 tracking-wide">Expiry Date</label>
+            <label className="text-sm text-white/70 tracking-wide">Card Number</label>
             <Input
               type="text"
-              value={expiry}
-              onChange={handleExpiryChange}
-              placeholder="MM/YY"
-              className="bg-transparent border-white/20 focus:border-gold transition-colors"
+              value={cardNumber}
+              onChange={handleCardNumberChange}
+              placeholder="1234 5678 9012 3456"
+              className="bg-transparent border-white/20 focus:border-[#914110] transition-colors"
               required
             />
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm text-white/70 tracking-wide">CVC</label>
+            <label className="text-sm text-white/70 tracking-wide">Cardholder Name</label>
             <Input
               type="text"
-              value={cvc}
-              onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').substring(0, 3))}
-              placeholder="123"
-              className="bg-transparent border-white/20 focus:border-gold transition-colors"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (e.target.value.length % 5 === 0) {
+                  provideFeedback('subtle');
+                }
+              }}
+              placeholder="John Doe"
+              className="bg-transparent border-white/20 focus:border-[#914110] transition-colors"
               required
-              maxLength={3}
             />
           </div>
-        </div>
-        
-        <div className="flex justify-between pt-4">
-          <Button 
-            type="button"
-            variant="outline" 
-            onClick={prevStep}
-            className="font-medium tracking-wide"
-            disabled={isProcessing}
-          >
-            Back
-          </Button>
-          <Button 
-            type="submit" 
-            className="booking-button"
-            disabled={isProcessing}
-          >
-            {isProcessing ? 'Processing...' : 'Complete Booking'}
-          </Button>
-        </div>
-      </motion.form>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm text-white/70 tracking-wide">Expiry Date</label>
+              <Input
+                type="text"
+                value={expiry}
+                onChange={handleExpiryChange}
+                placeholder="MM/YY"
+                className="bg-transparent border-white/20 focus:border-[#914110] transition-colors"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm text-white/70 tracking-wide">CVC</label>
+              <Input
+                type="text"
+                value={cvc}
+                onChange={(e) => {
+                  setCvc(e.target.value.replace(/\D/g, '').substring(0, 3));
+                  if (e.target.value.length === 3) {
+                    provideFeedback('subtle');
+                  }
+                }}
+                placeholder="123"
+                className="bg-transparent border-white/20 focus:border-[#914110] transition-colors"
+                required
+                maxLength={3}
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-between pt-4">
+            <Button 
+              type="button"
+              variant="outline" 
+              onClick={prevStep}
+              className="font-medium tracking-wide"
+              disabled={isProcessing}
+              onMouseDown={() => provideFeedback('buttonPress')}
+            >
+              Back
+            </Button>
+            <Button 
+              type="submit" 
+              className="booking-button"
+              disabled={isProcessing}
+              onMouseDown={() => provideFeedback('navigation')}
+            >
+              {isProcessing ? 'Processing...' : 'Complete Booking'}
+            </Button>
+          </div>
+        </motion.form>
+      </div>
     </motion.div>
   );
 };

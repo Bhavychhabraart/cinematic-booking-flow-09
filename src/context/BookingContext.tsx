@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define types for different booking add-ons based on booking type
@@ -40,6 +39,17 @@ export interface TablePreference {
   notes: string;
 }
 
+export interface Coupon {
+  id: string;
+  code: string;
+  description: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  validBookingTypes: string[];
+  expiryDate?: Date;
+  minSpend?: number;
+}
+
 interface BookingState {
   step: number;
   bookingType: string;
@@ -64,12 +74,14 @@ interface BookingState {
   dietaryRestrictions?: string[];
   paymentMethod?: string;
   agreedToTerms: boolean;
+  appliedCouponId?: string;
 }
 
 interface BookingContextType {
   booking: BookingState;
   availableAddOns: AddOn[];
   availableExperiences: Experience[];
+  availableCoupons: Coupon[];
   setBookingType: (type: string) => void;
   setGuestCount: (count: number) => void;
   setDate: (date: Date) => void;
@@ -86,13 +98,27 @@ interface BookingContextType {
   setDietaryRestrictions: (restrictions: string[]) => void;
   setPaymentMethod: (method: string) => void;
   setAgreedToTerms: (agreed: boolean) => void;
+  applyCoupon: (couponId: string) => void;
+  removeCoupon: () => void;
   nextStep: () => void;
   prevStep: () => void;
   resetBooking: () => void;
   completeBooking: () => void;
   getTotalPrice: () => number;
+  getSubtotal: () => number;
+  getDiscount: () => number;
+  getPriceBreakdown: () => { 
+    subtotal: number; 
+    addOnsTotal: number;
+    experiencesTotal: number;
+    basePrice: number;
+    discount: number;
+    total: number;
+    appliedCoupon: Coupon | null;
+  };
   getFilteredAddOns: () => AddOn[];
   getFilteredExperiences: () => Experience[];
+  getValidCoupons: () => Coupon[];
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -229,6 +255,37 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
   ]);
 
+  // Sample coupons - in a real app, these would come from an API or backend
+  const [availableCoupons] = useState<Coupon[]>([
+    {
+      id: 'welcome10',
+      code: 'WELCOME10',
+      description: 'Welcome Discount',
+      discountType: 'percentage',
+      discountValue: 10,
+      validBookingTypes: ['lunch', 'dinner', 'vip_standing', 'vip_couch', 'guestlist', 'private', 'event'],
+      minSpend: 50
+    },
+    {
+      id: 'vip20',
+      code: 'VIP20',
+      description: 'VIP Special Offer',
+      discountType: 'percentage',
+      discountValue: 20,
+      validBookingTypes: ['vip_standing', 'vip_couch'],
+      minSpend: 150
+    },
+    {
+      id: 'dinner25',
+      code: 'DINNER25',
+      description: '$25 Off Dinner',
+      discountType: 'fixed',
+      discountValue: 25,
+      validBookingTypes: ['dinner', 'private'],
+      minSpend: 100
+    }
+  ]);
+
   const setBookingType = (type: string) => {
     setBooking(prev => ({ ...prev, bookingType: type }));
   };
@@ -329,6 +386,20 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     }));
   };
 
+  const applyCoupon = (couponId: string) => {
+    setBooking(prev => ({
+      ...prev,
+      appliedCouponId: couponId
+    }));
+  };
+
+  const removeCoupon = () => {
+    setBooking(prev => ({
+      ...prev,
+      appliedCouponId: undefined
+    }));
+  };
+
   const nextStep = () => {
     setBooking(prev => ({ ...prev, step: prev.step + 1 }));
   };
@@ -375,35 +446,112 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     );
   };
 
-  const getTotalPrice = () => {
-    let total = 0;
+  const getValidCoupons = () => {
+    if (!booking.bookingType) return [];
+    return availableCoupons.filter(coupon => 
+      coupon.validBookingTypes.includes(booking.bookingType) && 
+      (!coupon.minSpend || getSubtotal() >= coupon.minSpend) &&
+      (!coupon.expiryDate || coupon.expiryDate >= new Date())
+    );
+  };
+
+  const getSubtotal = () => {
+    let subtotal = 0;
     
     // Add price for selected add-ons
-    booking.addOns.forEach(addonId => {
+    const addOnsTotal = booking.addOns.reduce((total, addonId) => {
       const addon = availableAddOns.find(a => a.id === addonId);
-      if (addon) total += addon.price;
-    });
+      return addon ? total + addon.price : total;
+    }, 0);
     
     // Add price for selected experiences
-    booking.selectedExperiences.forEach(expId => {
+    const experiencesTotal = booking.selectedExperiences.reduce((total, expId) => {
       const experience = availableExperiences.find(e => e.id === expId);
-      if (experience) total += experience.price;
-    });
+      return experience ? total + experience.price : total;
+    }, 0);
     
-    // Multiply by guest count for certain booking types
+    // Base price depending on booking type
+    let basePrice = 0;
     if (['lunch', 'dinner', 'vip_standing', 'vip_couch'].includes(booking.bookingType)) {
       // Base price is per person for these booking types
-      const basePrice = {
+      const basePriceRate = {
         'lunch': 0, // No cover charge for lunch
         'dinner': 0, // No cover charge for dinner
         'vip_standing': 45, // Cover charge for VIP standing
         'vip_couch': 75 // Cover charge for VIP couch
       }[booking.bookingType] || 0;
       
-      total += basePrice * booking.guestCount;
+      basePrice = basePriceRate * booking.guestCount;
     }
     
-    return total;
+    subtotal = addOnsTotal + experiencesTotal + basePrice;
+    
+    return subtotal;
+  };
+
+  const getDiscount = () => {
+    if (!booking.appliedCouponId) return 0;
+    
+    const coupon = availableCoupons.find(c => c.id === booking.appliedCouponId);
+    if (!coupon) return 0;
+    
+    const subtotal = getSubtotal();
+    
+    if (coupon.discountType === 'percentage') {
+      return (subtotal * coupon.discountValue) / 100;
+    } else {
+      return Math.min(subtotal, coupon.discountValue);
+    }
+  };
+
+  const getTotalPrice = () => {
+    return getSubtotal() - getDiscount();
+  };
+
+  const getPriceBreakdown = () => {
+    // Calculate add-ons total
+    const addOnsTotal = booking.addOns.reduce((total, addonId) => {
+      const addon = availableAddOns.find(a => a.id === addonId);
+      return addon ? total + addon.price : total;
+    }, 0);
+    
+    // Calculate experiences total
+    const experiencesTotal = booking.selectedExperiences.reduce((total, expId) => {
+      const experience = availableExperiences.find(e => e.id === expId);
+      return experience ? total + experience.price : total;
+    }, 0);
+    
+    // Calculate base price
+    let basePrice = 0;
+    if (['lunch', 'dinner', 'vip_standing', 'vip_couch'].includes(booking.bookingType)) {
+      const basePriceRate = {
+        'lunch': 0,
+        'dinner': 0,
+        'vip_standing': 45,
+        'vip_couch': 75
+      }[booking.bookingType] || 0;
+      
+      basePrice = basePriceRate * booking.guestCount;
+    }
+    
+    const subtotal = addOnsTotal + experiencesTotal + basePrice;
+    const discount = getDiscount();
+    const total = subtotal - discount;
+    
+    // Get applied coupon if any
+    const appliedCoupon = booking.appliedCouponId 
+      ? availableCoupons.find(c => c.id === booking.appliedCouponId) || null
+      : null;
+    
+    return {
+      subtotal,
+      addOnsTotal,
+      experiencesTotal,
+      basePrice,
+      discount,
+      total,
+      appliedCoupon
+    };
   };
 
   return (
@@ -411,6 +559,7 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       booking,
       availableAddOns,
       availableExperiences,
+      availableCoupons,
       setBookingType,
       setGuestCount,
       setDate,
@@ -427,13 +576,19 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       setDietaryRestrictions,
       setPaymentMethod,
       setAgreedToTerms,
+      applyCoupon,
+      removeCoupon,
       nextStep,
       prevStep,
       resetBooking,
       completeBooking,
       getTotalPrice,
+      getSubtotal,
+      getDiscount,
+      getPriceBreakdown,
       getFilteredAddOns,
-      getFilteredExperiences
+      getFilteredExperiences,
+      getValidCoupons
     }}>
       {children}
     </BookingContext.Provider>
