@@ -13,11 +13,8 @@ import BookingContact from '@/components/BookingContact';
 import BookingPreferences from '@/components/BookingPreferences';
 import BookingStepFour from '@/components/BookingStepFour';
 import BookingStepFive from '@/components/BookingStepFive';
-import { Users, Clock } from 'lucide-react';
 import { toast } from "@/components/ui/sonner";
 import { vibrate, vibrationPatterns, provideFeedback } from '@/utils/feedback';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Determine the maximum number of steps based on booking type
 const getMaxSteps = (bookingType: string): number => {
@@ -39,20 +36,12 @@ const getMaxSteps = (bookingType: string): number => {
   }
 };
 
-// Get the progress percentage based on current step and max steps
-const getProgressPercentage = (currentStep: number, maxSteps: number): number => {
-  return Math.min(100, Math.round((currentStep / (maxSteps - 1)) * 100));
-};
-
 const BookingSteps = () => {
   const { booking } = useBooking();
   const { venueName } = useParams();
   const navigate = useNavigate();
   const venue = getVenueBySlug(venueName || '');
-  const [activeUsers, setActiveUsers] = useState(Math.floor(Math.random() * 5) + 2);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
   const maxSteps = getMaxSteps(booking.bookingType);
-  const progressPercentage = getProgressPercentage(booking.step, maxSteps);
   
   useEffect(() => {
     if (!venue) {
@@ -69,44 +58,12 @@ const BookingSteps = () => {
           duration: 3000,
         });
       }
-    }, 120000); // Show a notification roughly every 2 minutes instead of every minute
-    
-    // Simulate other active users - less frequent updates
-    const userInterval = setInterval(() => {
-      setActiveUsers(prev => {
-        const change = Math.random() > 0.7 ? 1 : -1;
-        return Math.max(1, prev + change);
-      });
-    }, 60000); // Update every minute instead of every 45 seconds
-    
-    // Countdown timer
-    const timerInterval = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          // When timer ends, show warning but don't actually redirect
-          toast.warning("Your booking session is about to expire!", {
-            description: "We've extended your time by 10 minutes.",
-            duration: 5000,
-          });
-          vibrate(vibrationPatterns.warning);
-          return 600; // Reset to 10 minutes
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    }, 120000); // Show a notification roughly every 2 minutes
     
     return () => {
       clearInterval(notificationInterval);
-      clearInterval(userInterval);
-      clearInterval(timerInterval);
     };
   }, [venue, navigate]);
-  
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
   
   if (!venue) return null;
   
@@ -158,106 +115,12 @@ const BookingSteps = () => {
     return <BookingStepFive key="step5" />;
   };
 
-  // Get step names based on booking type
-  const getStepNames = () => {
-    if (['lunch', 'dinner', 'vip_standing', 'vip_couch', 'private'].includes(booking.bookingType)) {
-      return ["Type", "Guests", "Date", "Add-ons", "Experiences", "Preferences", "Contact", "Confirm"];
-    } else if (['guestlist', 'event'].includes(booking.bookingType)) {
-      return ["Type", "Guests", "Date", "Contact", "Confirm"];
-    } else {
-      return ["Type", "Guests", "Date", "Review", "Confirm"];
-    }
-  };
-
-  const stepNames = getStepNames();
-  
   return (
     <div className="min-h-screen pt-20 my-0 px-0 py-[47px]">
       <div className="container-center mb-10">
         <div className="text-center mb-12">
           <h1 className="font-medium tracking-widest text-4xl">{venue.name}</h1>
           <p className="text-white/60 font-light text-lg">Booking Experience</p>
-        </div>
-        
-        {/* FOMO indicators - more subtle placement */}
-        <div className="flex justify-between items-center mb-4 px-6 text-xs opacity-70">
-          <motion.div 
-            className="flex items-center text-white/60"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Users className="mr-1 h-4 w-4" />
-            <span>{activeUsers} people booking</span>
-          </motion.div>
-          
-          <motion.div 
-            className={`flex items-center ${timeLeft < 120 ? 'text-gold/70' : 'text-white/60'}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Clock className="mr-1 h-4 w-4" />
-            <span>Session: {formatTime(timeLeft)}</span>
-          </motion.div>
-        </div>
-        
-        {/* Clean, streamlined progress indicator */}
-        <div className="px-6 mb-8">
-          {/* Progress bar */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mb-2"
-          >
-            <Progress 
-              value={progressPercentage} 
-              className="h-1.5 bg-white/10" 
-              indicatorColor="bg-gold"
-            />
-          </motion.div>
-          
-          {/* Current step name indicator */}
-          <motion.div 
-            className="flex justify-between items-center mt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="text-xs text-white/60">
-              Step {booking.step + 1} of {maxSteps}
-            </div>
-            <div className="text-sm font-medium text-gold">
-              {stepNames[booking.step]}
-            </div>
-          </motion.div>
-          
-          {/* Tab indicators for steps */}
-          <Tabs value={booking.step.toString()} className="mt-4">
-            <TabsList className="bg-transparent w-full flex justify-between p-0 h-auto">
-              {stepNames.slice(0, maxSteps).map((_, index) => (
-                <TabsTrigger
-                  key={index}
-                  value={index.toString()}
-                  className="p-0 w-full data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                  disabled
-                >
-                  <motion.div
-                    className={`h-1.5 w-full rounded-full transition-colors ${
-                      index < booking.step 
-                        ? 'bg-gold/60' 
-                        : index === booking.step 
-                          ? 'bg-gold' 
-                          : 'bg-white/10'
-                    }`}
-                    initial={{ opacity: 0.6 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 * index }}
-                  />
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
         </div>
       </div>
       
