@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import LoyaltyPage from "./pages/LoyaltyPage";
 import { LoyaltyProvider } from "./context/LoyaltyContext";
 import InVenueExperience from "./pages/InVenueExperience";
+import TableOrderingPage from "./pages/TableOrderingPage";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/venue-experience/:venueName" element={<InVenueExperience />} />
             <Route path="/owner-dashboard" element={<OwnerDashboard />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/order/:venueName" element={<TableOrderingPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

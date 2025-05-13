@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ChevronLeft, Smartphone } from 'lucide-react';
+import { ChevronLeft, Smartphone, Utensils } from 'lucide-react';
 import { getVenueBySlug } from '@/data/venues';
 import VenueShowcase from '@/components/VenueShowcase';
 import LoyaltyPreview from '@/components/LoyaltyPreview';
@@ -23,6 +23,11 @@ const VenuePage: React.FC = () => {
   const handleExperienceClick = () => {
     provideFeedback('buttonPress');
     navigate(`/venue-experience/${venueName}`);
+  };
+
+  const handleOrderClick = () => {
+    provideFeedback('buttonPress');
+    navigate(`/order/${venueName}`);
   };
 
   return (
@@ -66,7 +71,7 @@ const VenuePage: React.FC = () => {
               <p className="text-white/70">{venue.city || 'City'}, {venue.zipCode || 'Zip code'}</p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={handleExperienceClick}
                 variant="outline"
@@ -75,6 +80,16 @@ const VenuePage: React.FC = () => {
               >
                 <Smartphone className="h-5 w-5" />
                 <span>In-Venue Experience</span>
+              </Button>
+              
+              <Button
+                onClick={handleOrderClick}
+                variant="outline"
+                size="lg"
+                className="flex items-center gap-2 border-burntOrange text-burntOrange hover:bg-burntOrange hover:text-white"
+              >
+                <Utensils className="h-5 w-5" />
+                <span>Order Now</span>
               </Button>
             
               <Button
