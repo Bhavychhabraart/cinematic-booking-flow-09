@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { venues } from '@/data/venues';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, Users, BookOpen, Music, Calendar, Plus, MessageSquare, Bell } from 'lucide-react';
+import { Menu, X, Users, BookOpen, Music, Calendar, Plus, MessageSquare, Bell, FileText, Bot } from 'lucide-react';
 import { 
   Sheet,
   SheetContent,
@@ -19,6 +19,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ReportGenerator from '@/components/admin/ReportGenerator';
+import VenueGPT from '@/components/admin/VenueGPT';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -65,6 +67,22 @@ const AdminDashboard = () => {
                   className={`block w-full text-left py-2 px-4 transition-all ${activeTab === "bookings" ? "text-white border-l-2 border-gold" : "text-white/60 hover:text-white hover:border-l-2 hover:border-gold/50"}`}
                 >
                   Bookings
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => setActiveTab("reports")} 
+                  className={`block w-full text-left py-2 px-4 transition-all ${activeTab === "reports" ? "text-white border-l-2 border-gold" : "text-white/60 hover:text-white hover:border-l-2 hover:border-gold/50"}`}
+                >
+                  Report Generator
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => setActiveTab("venuegpt")} 
+                  className={`block w-full text-left py-2 px-4 transition-all ${activeTab === "venuegpt" ? "text-white border-l-2 border-gold" : "text-white/60 hover:text-white hover:border-l-2 hover:border-gold/50"}`}
+                >
+                  VenueGPT Insights
                 </button>
               </li>
               <li>
@@ -156,6 +174,8 @@ const AdminDashboard = () => {
           {activeTab === "dashboard" && <DashboardContent />}
           {activeTab === "venues" && <VenuesContent />}
           {activeTab === "bookings" && <BookingsContent />}
+          {activeTab === "reports" && <ReportGenerator />}
+          {activeTab === "venuegpt" && <VenueGPT />}
           {activeTab === "influencers" && <InfluencerRequestsContent />}
           {activeTab === "events" && <EventsContent />}
           {activeTab === "djs" && <DJBookingContent />}
@@ -175,6 +195,8 @@ const getTitleFromTab = (tab) => {
     dashboard: "Dashboard Overview",
     venues: "Venues Management",
     bookings: "Venue Bookings",
+    reports: "Report Generator",
+    venuegpt: "VenueGPT AI Insights",
     influencers: "Influencer Collaboration Requests",
     events: "Event Management",
     djs: "DJ Booking",
