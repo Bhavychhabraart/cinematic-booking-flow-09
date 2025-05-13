@@ -269,7 +269,8 @@ export const LoyaltyProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
     }
     
-    const totalPointsEarned = basePoints + guestPoints + spendPoints + consecutiveBonus;
+    // Initialize totalPointsEarned as a let so we can modify it later
+    let totalPointsEarned = basePoints + guestPoints + spendPoints + consecutiveBonus;
     
     // Update loyalty state
     setLoyalty(prev => {

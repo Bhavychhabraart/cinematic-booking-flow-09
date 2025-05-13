@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,7 @@ const VenuePage = () => {
   return (
     <div className="pb-20">
       <div className="h-[60vh]">
-        <VenueShowcase venue={venue} />
+        <VenueShowcase venueSlug={venueName || ''} />
       </div>
 
       <div className="container mx-auto px-4 -mt-10 mb-10">
@@ -40,7 +41,7 @@ const VenuePage = () => {
           <h1 className="text-3xl md:text-4xl font-bold mb-2">{venue.name}</h1>
 
           <div className="flex gap-2 mb-4 flex-wrap">
-            {venue.tags.map((tag, index) => (
+            {venue.tags?.map((tag, index) => (
               <Badge key={index} variant="outline" className="bg-white/5">
                 {tag}
               </Badge>
@@ -54,8 +55,8 @@ const VenuePage = () => {
           <div className="flex flex-col md:flex-row gap-6 md:items-center justify-between">
             <div>
               <h2 className="text-xl font-bold mb-2">Location</h2>
-              <p className="text-white/70">{venue.address}</p>
-              <p className="text-white/70">{venue.city}, {venue.zipCode}</p>
+              <p className="text-white/70">{venue.address || 'Address not available'}</p>
+              <p className="text-white/70">{venue.city || 'City'}, {venue.zipCode || 'Zip code'}</p>
             </div>
 
             <Button
@@ -78,21 +79,21 @@ const VenuePage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-bold mb-2">Opening Hours</h3>
-                <p className="text-white/70 mb-1">Monday - Thursday: {venue.openingHours.weekdays}</p>
-                <p className="text-white/70 mb-1">Friday - Saturday: {venue.openingHours.weekends}</p>
-                <p className="text-white/70">Sunday: {venue.openingHours.sunday}</p>
+                <p className="text-white/70 mb-1">Monday - Thursday: {typeof venue.openingHours === 'object' ? venue.openingHours.weekdays : 'Not specified'}</p>
+                <p className="text-white/70 mb-1">Friday - Saturday: {typeof venue.openingHours === 'object' ? venue.openingHours.weekends : 'Not specified'}</p>
+                <p className="text-white/70">Sunday: {typeof venue.openingHours === 'object' ? venue.openingHours.sunday : 'Not specified'}</p>
               </div>
               
               <div>
                 <h3 className="font-bold mb-2">Dress Code</h3>
-                <p className="text-white/70">{venue.dressCode}</p>
+                <p className="text-white/70">{venue.dressCode || 'No specific dress code'}</p>
               </div>
             </div>
             
             <div className="mt-6">
               <h3 className="font-bold mb-2">Amenities</h3>
               <ul className="grid grid-cols-2 gap-2">
-                {venue.amenities.map((amenity, index) => (
+                {venue.amenities?.map((amenity, index) => (
                   <li key={index} className="text-white/70 flex items-center">
                     <span className="w-1.5 h-1.5 bg-[#914110] rounded-full mr-2"></span>
                     <span>{amenity}</span>
