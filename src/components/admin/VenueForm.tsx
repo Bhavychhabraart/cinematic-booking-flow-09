@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -87,8 +88,8 @@ const VenueForm = ({ onSubmit, initialValues }: VenueFormProps) => {
           : '18:00 - 22:00',
       },
       dressCode: initialValues?.dressCode || '',
-      tags: initialValues?.tags?.join(', ') || '',
-      amenities: initialValues?.amenities?.join(', ') || '',
+      tags: initialValues?.tags || [],  // Fix: Initialize as an empty array, not a string
+      amenities: initialValues?.amenities || [],  // Fix: Initialize as an empty array, not a string
     },
   });
 

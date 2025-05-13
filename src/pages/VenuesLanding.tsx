@@ -85,7 +85,8 @@ const PricingCard = ({
 const FeatureCard = ({ icon: Icon, title, description, delay = 0 }) => {
   const controls = useAnimation();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, threshold: 0.3 });
+  // Fix: Remove threshold from useInView options as it's not a valid property
+  const inView = useInView(ref, { once: true });
   
   useEffect(() => {
     if (inView) {
