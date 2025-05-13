@@ -4,11 +4,16 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Users, CreditCard, Badge, Calendar, CheckCircle } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('bookings');
+  const [selectedPlan, setSelectedPlan] = useState('basic');
+  const [isProcessing, setIsProcessing] = useState(false);
   
   // Mock data
   const recentBookings = [
@@ -31,6 +36,59 @@ const OwnerDashboard = () => {
     { label: 'Avg. Party Size', value: '3.5' },
     { label: 'Revenue', value: '$12,450' }
   ];
+
+  const premiumPlans = [
+    {
+      id: 'basic',
+      name: 'Basic Premium',
+      price: '$99/month',
+      features: [
+        '100 guest list entries per month',
+        'Basic analytics',
+        'Email notifications',
+        'Standard customer support'
+      ],
+      recommended: false
+    },
+    {
+      id: 'pro',
+      name: 'Professional',
+      price: '$199/month',
+      features: [
+        'Unlimited guest list entries',
+        'Advanced analytics and reports',
+        'SMS notifications',
+        'Priority customer support',
+        'VIP guest tagging'
+      ],
+      recommended: true
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      price: '$399/month',
+      features: [
+        'All Professional features',
+        'Custom branding',
+        'API access',
+        'Dedicated account manager',
+        'Multiple venue management'
+      ],
+      recommended: false
+    }
+  ];
+
+  const handlePurchase = () => {
+    setIsProcessing(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsProcessing(false);
+      toast.success(`${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} premium plan purchased successfully!`, {
+        description: "Your premium guest list features are now active."
+      });
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen p-6 sm:p-10">
@@ -89,6 +147,15 @@ const OwnerDashboard = () => {
               }`}
             >
               Inventory
+            </button>
+            <button 
+              onClick={() => setActiveTab('premium')} 
+              className={`py-3 px-6 text-sm tracking-wider flex items-center gap-2 ${
+                activeTab === 'premium' ? 'border-b-2 border-gold text-gold' : 'text-white/60'
+              }`}
+            >
+              <Badge size={16} />
+              Premium Guest List
             </button>
           </div>
           
@@ -164,6 +231,114 @@ const OwnerDashboard = () => {
                   </div>
                 </motion.div>
               ))}
+            </motion.div>
+          )}
+
+          {activeTab === 'premium' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              <div className="bg-white/5 border border-white/10 p-6 rounded-md">
+                <div className="flex items-center mb-4">
+                  <Badge className="text-gold mr-2" size={20} />
+                  <h2 className="text-xl font-medium">Premium Guest List Access</h2>
+                </div>
+                
+                <p className="text-white/70 mb-6">
+                  Upgrade your guest list management with premium features. Enhance your venue's guest experience, 
+                  track VIPs, and gain valuable insights with advanced analytics.
+                </p>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                  <RadioGroup value={selectedPlan} onValueChange={setSelectedPlan}>
+                    {premiumPlans.map((plan) => (
+                      <div 
+                        key={plan.id}
+                        className={`relative border ${selectedPlan === plan.id ? 'border-gold' : 'border-white/10'} 
+                        rounded-md p-4 hover:bg-white/5 transition-colors cursor-pointer ${plan.recommended ? 'bg-white/5' : ''}`}
+                      >
+                        {plan.recommended && (
+                          <span className="absolute -top-3 right-4 bg-gold text-black text-xs px-2 py-1 rounded-full">
+                            Recommended
+                          </span>
+                        )}
+                        <div className="flex items-start">
+                          <RadioGroupItem value={plan.id} id={plan.id} className="mt-1" />
+                          <div className="ml-3">
+                            <Label htmlFor={plan.id} className="font-medium text-lg block mb-1">
+                              {plan.name}
+                            </Label>
+                            <p className="text-gold text-xl mb-3">{plan.price}</p>
+                            <ul className="space-y-2">
+                              {plan.features.map((feature, idx) => (
+                                <li key={idx} className="flex items-center text-white/80">
+                                  <CheckCircle size={16} className="text-green-400 mr-2 flex-shrink-0" />
+                                  <span className="text-sm">{feature}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={handlePurchase}
+                    disabled={isProcessing}
+                    size="lg"
+                    className="bg-gold text-black hover:bg-gold/90 px-8 py-6 text-lg flex items-center gap-2"
+                  >
+                    {isProcessing ? (
+                      <>Processing...</>
+                    ) : (
+                      <>
+                        <CreditCard size={20} />
+                        Purchase Premium Plan
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                <p className="text-center text-white/50 text-sm mt-4">
+                  All plans include a 14-day money-back guarantee
+                </p>
+              </div>
+
+              <div className="bg-white/5 border border-white/10 p-6 rounded-md">
+                <h3 className="text-lg font-medium mb-4">Premium Guest List Benefits</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-start">
+                    <div className="bg-gold/20 p-2 rounded-md mr-3">
+                      <Users size={20} className="text-gold" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">VIP Management</h4>
+                      <p className="text-white/70 text-sm">
+                        Tag and track your VIP guests, provide special accommodations, and ensure they receive premium service.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="bg-gold/20 p-2 rounded-md mr-3">
+                      <Calendar size={20} className="text-gold" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Advanced Booking Features</h4>
+                      <p className="text-white/70 text-sm">
+                        Allow guests to pre-register for events, set capacity limits, and send automated reminders.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
         </div>
