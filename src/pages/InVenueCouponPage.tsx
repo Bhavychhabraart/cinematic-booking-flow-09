@@ -22,9 +22,9 @@ import {
   RadioGroup,
   RadioGroupItem,
 } from "@/components/ui/radio-group";
-import { QrCode, Ticket, Beer } from 'lucide-react';
+import { QrCode, Ticket, Beer, AlertCircle } from 'lucide-react';
 import { provideFeedback, sounds } from '@/utils/feedback';
-import { generateCouponId } from '@/utils/coupons';
+import { generateCouponId, hasClaimedToday, recordCouponClaim, getRemainingCoupons } from '@/utils/coupons';
 
 // Form schema
 const formSchema = z.object({
@@ -63,7 +63,7 @@ const drinkOptions = [
 const InVenueCouponPage: React.FC = () => {
   const { venueName } = useParams();
   const venue = getVenueBySlug(venueName || '');
-  const [step, setStep] = useState<'info' | 'drink' | 'coupons'>('info');
+  const [step, setStep] = useState<'info' | 'drink' | 'coupons' | 'limit-reached'>('info');
   const [coupons, setCoupons] = useState<string[]>([]);
   
   // Form definition
@@ -80,6 +80,15 @@ const InVenueCouponPage: React.FC = () => {
   const handleVerifyInfo = (values: FormValues) => {
     provideFeedback('success', sounds.success);
     
+    // Check if user has already claimed coupons today
+    if (hasClaimedToday(values.phone)) {
+      toast.error("Daily limit reached", {
+        description: "You've already claimed your complimentary drinks today.",
+      });
+      setStep('limit-reached');
+      return;
+    }
+    
     // Save form data and proceed to drink selection
     setStep('drink');
   };
@@ -87,6 +96,9 @@ const InVenueCouponPage: React.FC = () => {
   // Handle submission of drink choice
   const handleDrinkSubmit = (values: FormValues) => {
     provideFeedback('celebratory', sounds.victory);
+    
+    // Record this claim
+    recordCouponClaim(values.phone);
     
     // Generate 3 unique coupon codes
     const newCoupons = [
@@ -110,7 +122,7 @@ const InVenueCouponPage: React.FC = () => {
     form.reset();
     setStep('info');
     setCoupons([]);
-    provideFeedback('buttonPress');
+    provideFeedback('subtle');
   };
 
   if (!venue) {
@@ -135,12 +147,14 @@ const InVenueCouponPage: React.FC = () => {
             {step === 'info' && <QrCode className="h-16 w-16 text-purple-500" />}
             {step === 'drink' && <Beer className="h-16 w-16 text-amber-500" />}
             {step === 'coupons' && <Ticket className="h-16 w-16 text-green-500" />}
+            {step === 'limit-reached' && <AlertCircle className="h-16 w-16 text-red-500" />}
           </div>
           <h1 className="text-3xl font-bold text-white">{venue.name} Drinks</h1>
           <p className="mt-2 text-lg text-gray-300">
             {step === 'info' && "Claim your complimentary drinks"}
             {step === 'drink' && "Choose your drink preference"}
             {step === 'coupons' && "Your drink coupons"}
+            {step === 'limit-reached' && "Daily limit reached"}
           </p>
         </motion.div>
 
@@ -311,7 +325,7 @@ const InVenueCouponPage: React.FC = () => {
               <div className="space-y-4 my-6">
                 {coupons.map((coupon, index) => (
                   <motion.div 
-                    key={coupon}
+                    key={`coupon-${index}-${coupon}`}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.2 }}
@@ -343,6 +357,36 @@ const InVenueCouponPage: React.FC = () => {
               >
                 Start Over
               </Button>
+            </motion.div>
+          )}
+          
+          {/* Step 4: Daily limit reached */}
+          {step === 'limit-reached' && (
+            <motion.div
+              key="limit-reached"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{ duration: 0.3 }}
+              className="rounded-xl bg-white p-6 shadow-lg"
+            >
+              <div className="text-center">
+                <div className="mx-auto mb-4 h-24 w-24 rounded-full bg-red-100 p-4 flex items-center justify-center">
+                  <AlertCircle className="h-12 w-12 text-red-500" />
+                </div>
+                <h2 className="text-xl font-bold mb-2">Daily Limit Reached</h2>
+                <p className="text-gray-600 mb-6">
+                  You've already claimed your complimentary drinks today. Please come back tomorrow!
+                </p>
+                
+                <Button 
+                  className="w-full"
+                  variant="outline"
+                  onClick={handleNewCoupons}
+                >
+                  Try Another Phone Number
+                </Button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

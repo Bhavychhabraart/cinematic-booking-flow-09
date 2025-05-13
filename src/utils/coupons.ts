@@ -31,7 +31,7 @@ export function hasClaimedToday(phoneNumber: string): boolean {
     phoneRedemptions[phoneNumber] && 
     phoneRedemptions[phoneNumber].date === today
   ) {
-    return true;
+    return phoneRedemptions[phoneNumber].count >= 3;
   }
   
   return false;
@@ -41,8 +41,32 @@ export function hasClaimedToday(phoneNumber: string): boolean {
 export function recordCouponClaim(phoneNumber: string): void {
   const today = new Date().toISOString().split('T')[0];
   
-  phoneRedemptions[phoneNumber] = {
-    count: 3, // We always give 3 coupons
-    date: today
-  };
+  if (!phoneRedemptions[phoneNumber]) {
+    phoneRedemptions[phoneNumber] = {
+      count: 3,
+      date: today
+    };
+  } else if (phoneRedemptions[phoneNumber].date === today) {
+    phoneRedemptions[phoneNumber].count += 3;
+  } else {
+    // New day, reset count
+    phoneRedemptions[phoneNumber] = {
+      count: 3,
+      date: today
+    };
+  }
+  
+  console.log(`Recorded claim for ${phoneNumber}: ${phoneRedemptions[phoneNumber].count} coupons on ${today}`);
+}
+
+// Get remaining coupons for a user today
+export function getRemainingCoupons(phoneNumber: string): number {
+  const today = new Date().toISOString().split('T')[0];
+  
+  if (phoneRedemptions[phoneNumber] && phoneRedemptions[phoneNumber].date === today) {
+    // For this demo, we limit to 3 per day
+    return Math.max(0, 3 - phoneRedemptions[phoneNumber].count);
+  }
+  
+  return 3; // Default max
 }
