@@ -8,7 +8,17 @@ export interface Venue {
   imageUrl: string;
   logoUrl: string;
   location: string;
-  openingHours: string;
+  address?: string;
+  city?: string;
+  zipCode?: string;
+  openingHours: string | {
+    weekdays: string;
+    weekends: string;
+    sunday: string;
+  };
+  dressCode?: string;
+  tags?: string[];
+  amenities?: string[];
 }
 
 export const venues: Venue[] = [
@@ -21,7 +31,17 @@ export const venues: Venue[] = [
     imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0',
     logoUrl: 'https://images.unsplash.com/photo-1522336572468-97b06e8ef143',
     location: 'Downtown, 123 Vine Street',
-    openingHours: 'Mon-Sun: 18:00 - 00:00'
+    address: '123 Vine Street',
+    city: 'Downtown',
+    zipCode: '90210',
+    openingHours: {
+      weekdays: '18:00 - 00:00',
+      weekends: '18:00 - 02:00',
+      sunday: '18:00 - 22:00'
+    },
+    dressCode: 'Smart Casual',
+    tags: ['Fine Dining', 'Wine', 'Seasonal'],
+    amenities: ['Valet Parking', 'Private Dining', 'Outdoor Seating', 'Sommelier']
   },
   {
     id: '2',
@@ -32,7 +52,17 @@ export const venues: Venue[] = [
     imageUrl: 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2',
     logoUrl: 'https://images.unsplash.com/photo-1642349281449-0f47a2d8c548',
     location: 'Marina District, 45 Harbor Blvd',
-    openingHours: 'Thu-Sat: 22:00 - 04:00'
+    address: '45 Harbor Blvd',
+    city: 'Marina District',
+    zipCode: '90211',
+    openingHours: {
+      weekdays: 'Closed',
+      weekends: '22:00 - 04:00',
+      sunday: 'Closed'
+    },
+    dressCode: 'Upscale',
+    tags: ['Nightclub', 'DJ', 'VIP'],
+    amenities: ['VIP Tables', 'Bottle Service', 'Dance Floor', 'Live DJ']
   },
   {
     id: '3',
@@ -43,7 +73,13 @@ export const venues: Venue[] = [
     imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3',
     logoUrl: 'https://images.unsplash.com/photo-1526379879527-8559ecfcb970',
     location: 'Arts District, 78 Gallery Way',
-    openingHours: 'By appointment only'
+    address: '78 Gallery Way',
+    city: 'Arts District',
+    zipCode: '90212',
+    openingHours: 'By appointment only',
+    dressCode: 'Event Dependent',
+    tags: ['Event Space', 'Private Parties', 'Corporate'],
+    amenities: ['AV Equipment', 'Catering', 'Stage', 'Flexible Layout']
   },
   {
     id: '4',
@@ -54,7 +90,17 @@ export const venues: Venue[] = [
     imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5',
     logoUrl: 'https://images.unsplash.com/photo-1649599007800-5633a4a01d8b',
     location: 'Old Town, 56 Heritage Road',
-    openingHours: 'Tue-Sun: 17:00 - 23:00'
+    address: '56 Heritage Road',
+    city: 'Old Town',
+    zipCode: '90213',
+    openingHours: {
+      weekdays: '17:00 - 23:00',
+      weekends: '17:00 - 00:00',
+      sunday: '17:00 - 22:00'
+    },
+    dressCode: 'Business Casual',
+    tags: ['European', 'Elegant', 'Garden View'],
+    amenities: ['Garden Seating', 'Private Rooms', 'Wine Pairing', 'Chef\'s Table']
   }
 ];
 

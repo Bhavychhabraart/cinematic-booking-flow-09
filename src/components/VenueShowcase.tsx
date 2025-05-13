@@ -35,9 +35,11 @@ const demoImages: ShowcaseImage[] = [
 
 interface VenueShowcaseProps {
   images?: ShowcaseImage[];
+  venueSlug?: string;  // Added venueSlug prop
 }
 
-const VenueShowcase = ({ images = demoImages }: VenueShowcaseProps) => {
+const VenueShowcase = ({ images = demoImages, venueSlug }: VenueShowcaseProps) => {
+  // You can use venueSlug to fetch venue-specific images if needed
   return (
     <motion.div
       initial={{ opacity: 0 }}

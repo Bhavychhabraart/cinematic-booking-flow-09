@@ -9,13 +9,14 @@ import { getVenueBySlug } from '@/data/venues';
 import VenueShowcase from '@/components/VenueShowcase';
 import LoyaltyPreview from '@/components/LoyaltyPreview';
 
-const VenuePage = () => {
+const VenuePage: React.FC = () => {
   const { venueName } = useParams();
   const navigate = useNavigate();
   const venue = getVenueBySlug(venueName || '');
 
   if (!venue) {
-    return navigate('/');
+    navigate('/');
+    return null;
   }
 
   return (
