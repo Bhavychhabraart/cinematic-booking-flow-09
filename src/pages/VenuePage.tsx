@@ -4,16 +4,19 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ChevronLeft, Smartphone, Utensils } from 'lucide-react';
+import { ChevronLeft, Smartphone, Utensils, Gift } from 'lucide-react';
 import { getVenueBySlug } from '@/data/venues';
 import VenueShowcase from '@/components/VenueShowcase';
 import LoyaltyPreview from '@/components/LoyaltyPreview';
 import { provideFeedback, vibrationPatterns } from '@/utils/feedback';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import GiftCardPurchase from '@/components/GiftCardPurchase';
 
 const VenuePage: React.FC = () => {
   const { venueName } = useParams();
   const navigate = useNavigate();
   const venue = getVenueBySlug(venueName || '');
+  const [giftCardOpen, setGiftCardOpen] = React.useState(false);
 
   if (!venue) {
     navigate('/');
@@ -28,6 +31,11 @@ const VenuePage: React.FC = () => {
   const handleOrderClick = () => {
     provideFeedback('buttonPress');
     navigate(`/order/${venueName}`);
+  };
+
+  const handleGiftCardClick = () => {
+    provideFeedback('buttonPress');
+    setGiftCardOpen(true);
   };
 
   return (
@@ -101,6 +109,18 @@ const VenuePage: React.FC = () => {
               </Button>
             </div>
           </div>
+          
+          {/* Gift card button */}
+          <div className="flex justify-end mt-4">
+            <Button 
+              onClick={handleGiftCardClick}
+              variant="outline" 
+              className="border-gold text-gold hover:bg-gold hover:text-black flex items-center gap-2"
+            >
+              <Gift size={16} />
+              <span>Buy Gift Card</span>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -144,6 +164,16 @@ const VenuePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Gift Card Dialog */}
+      <Dialog open={giftCardOpen} onOpenChange={setGiftCardOpen}>
+        <DialogContent className="max-w-lg bg-black/90 border-gold/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-center">Purchase a Gift Card</DialogTitle>
+          </DialogHeader>
+          <GiftCardPurchase venueName={venueName || ''} onComplete={() => setGiftCardOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

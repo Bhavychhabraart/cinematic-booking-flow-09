@@ -31,6 +31,7 @@ export type CartItem = {
     name: string;
     price: number;
   }[];
+  isGiftCard?: boolean;
 };
 
 export type OrderDiscount = {
@@ -48,7 +49,7 @@ export type OrderDiscount = {
 interface OrderContextType {
   menu: MenuItem[];
   cartItems: CartItem[];
-  addToCart: (item: MenuItem, quantity?: number, specialInstructions?: string, addOns?: any[]) => void;
+  addToCart: (item: MenuItem, quantity?: number, specialInstructions?: string, addOns?: any[], isGiftCard?: boolean) => void;
   removeFromCart: (itemId: string) => void;
   updateCartItemQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -281,19 +282,19 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const pointsEarned = Math.floor(total * 2); // 2 points per dollar
 
   // Add item to cart
-  const addToCart = (menuItem: MenuItem, quantity = 1, specialInstructions = '', addOns = []) => {
+  const addToCart = (menuItem: MenuItem, quantity = 1, specialInstructions = '', addOns = [], isGiftCard = false) => {
     setCartItems(prevItems => {
       // Check if the item is already in the cart
       const existingItemIndex = prevItems.findIndex(item => item.menuItem.id === menuItem.id);
       
-      if (existingItemIndex >= 0) {
-        // Update existing item quantity
+      if (existingItemIndex >= 0 && !isGiftCard) {
+        // Update existing item quantity only for non-gift card items
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += quantity;
         return updatedItems;
       } else {
         // Add new item
-        return [...prevItems, { menuItem, quantity, specialInstructions, addOns }];
+        return [...prevItems, { menuItem, quantity, specialInstructions, addOns, isGiftCard }];
       }
     });
     
@@ -303,7 +304,9 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setRecentlyAddedItem(menuItem.id);
     setTimeout(() => setRecentlyAddedItem(null), 3000);
     
-    toast(`Added: ${menuItem.name}`, {
+    const itemDescription = isGiftCard ? 'Gift Card' : menuItem.name;
+    
+    toast(`Added: ${itemDescription}`, {
       description: `${quantity}× added to your order`,
     });
   };

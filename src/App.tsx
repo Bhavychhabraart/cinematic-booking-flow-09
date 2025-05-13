@@ -15,6 +15,7 @@ import { LoyaltyProvider } from "./context/LoyaltyContext";
 import InVenueExperience from "./pages/InVenueExperience";
 import TableOrderingPage from "./pages/TableOrderingPage";
 import InVenueCouponPage from "./pages/InVenueCouponPage";
+import { OrderProvider } from "./context/OrderContext";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -23,23 +24,25 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LoyaltyProvider>
-        <Router>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/venues/:venueName" element={<VenuePage />} />
-            <Route path="/book/:venueName" element={<BookingFlow />} />
-            <Route path="/loyalty" element={<LoyaltyPage />} />
-            <Route path="/loyalty/:venueName" element={<LoyaltyPage />} />
-            <Route path="/venue-experience/:venueName" element={<InVenueExperience />} />
-            <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/order/:venueName" element={<TableOrderingPage />} />
-            <Route path="/coupons/:venueName" element={<InVenueCouponPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
+        <OrderProvider>
+          <Router>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/venues/:venueName" element={<VenuePage />} />
+              <Route path="/book/:venueName" element={<BookingFlow />} />
+              <Route path="/loyalty" element={<LoyaltyPage />} />
+              <Route path="/loyalty/:venueName" element={<LoyaltyPage />} />
+              <Route path="/venue-experience/:venueName" element={<InVenueExperience />} />
+              <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/order/:venueName" element={<TableOrderingPage />} />
+              <Route path="/coupons/:venueName" element={<InVenueCouponPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Router>
+        </OrderProvider>
       </LoyaltyProvider>
     </TooltipProvider>
   </QueryClientProvider>
