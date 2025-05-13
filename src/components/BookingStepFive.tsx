@@ -4,10 +4,12 @@ import { CheckCircle, Download, Receipt, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBooking } from '@/context/BookingContext';
+import { useLoyalty } from '@/context/LoyaltyContext';
 import { format } from 'date-fns';
 import { toast } from "@/components/ui/sonner";
 import { vibrate, vibrationPatterns, playSound, sounds } from '@/utils/feedback';
 import { formatCurrency, generateVoucherCode } from '@/utils/formatters';
+import LoyaltyPointsEarned from './LoyaltyPointsEarned';
 
 const generateQR = (data: string) => {
   // Mock function to "generate" a QR code
@@ -93,10 +95,13 @@ const BookingStepFive: React.FC = () => {
   const navigate = useNavigate();
   const { venueName } = useParams();
   const { booking, resetBooking, getPriceBreakdown } = useBooking();
+  const { recordBooking, loyalty } = useLoyalty();
+  
   const [bubbles, setBubbles] = useState<number[]>([]);
   const [qrCode, setQrCode] = useState<{ qrData: boolean[][]; size: number; cellSize: number } | null>(null);
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [showVouchers, setShowVouchers] = useState(false);
+  const [earnedPoints, setEarnedPoints] = useState(0);
   
   const { total, appliedCoupon } = getPriceBreakdown();
   
@@ -118,6 +123,19 @@ const BookingStepFive: React.FC = () => {
     // Play victory sound and vibration when component mounts
     playSound(sounds.victory);
     vibrate(vibrationPatterns.success);
+    
+    // Record the booking in the loyalty system and get points earned
+    if (venueName) {
+      const pointsEarned = recordBooking(
+        venueName,
+        venueName,
+        total,
+        booking.guestCount,
+        booking.bookingType
+      );
+      
+      setEarnedPoints(pointsEarned);
+    }
     
     const intervalId = setInterval(() => {
       setBubbles(prev => [...prev, Date.now()]);
@@ -153,7 +171,7 @@ const BookingStepFive: React.FC = () => {
     }, 1500);
     
     return () => clearInterval(intervalId);
-  }, [booking, venueName]);
+  }, [booking, venueName, total, recordBooking]);
   
   const handleDownloadQR = () => {
     // Add haptic feedback
@@ -176,6 +194,11 @@ const BookingStepFive: React.FC = () => {
     
     resetBooking();
     navigate(`/venues/${venueName}`);
+  };
+  
+  const handleViewLoyalty = () => {
+    resetBooking();
+    navigate(`/loyalty/${venueName}`);
   };
   
   return (
@@ -236,12 +259,37 @@ const BookingStepFive: React.FC = () => {
         </motion.div>
       </motion.div>
       
+      {/* Loyalty Points Earned */}
+      {earnedPoints > 0 && (
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 1.1 }}
+          className="mb-6"
+        >
+          <LoyaltyPointsEarned 
+            points={earnedPoints} 
+            newTotal={loyalty.currentPoints}
+            message="You earned loyalty points!"
+          />
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="mt-2 border-[#914110]/50 text-[#914110] hover:bg-[#914110]/5"
+            onClick={handleViewLoyalty}
+          >
+            View Loyalty Dashboard
+          </Button>
+        </motion.div>
+      )}
+      
       {/* QR Code */}
       {qrCode && (
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 1.2 }}
+          transition={{ delay: 1.3 }}
           className="mb-6 flex flex-col items-center"
         >
           <div className="bg-white p-4 rounded-lg mb-2 mx-auto">
@@ -287,7 +335,7 @@ const BookingStepFive: React.FC = () => {
       <motion.p
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 1.4 }}
+        transition={{ delay: 1.5 }}
         className="text-white/60 text-sm mb-6"
       >
         A confirmation email with your booking details has been sent to your email address.

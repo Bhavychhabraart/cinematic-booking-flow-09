@@ -10,6 +10,8 @@ import BookingFlow from "./pages/BookingFlow";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import LoyaltyPage from "./pages/LoyaltyPage";
+import { LoyaltyProvider } from "./context/LoyaltyContext";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -17,18 +19,22 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Router>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/venues/:venueName" element={<VenuePage />} />
-          <Route path="/book/:venueName" element={<BookingFlow />} />
-          <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
+      <LoyaltyProvider>
+        <Router>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/venues/:venueName" element={<VenuePage />} />
+            <Route path="/book/:venueName" element={<BookingFlow />} />
+            <Route path="/loyalty" element={<LoyaltyPage />} />
+            <Route path="/loyalty/:venueName" element={<LoyaltyPage />} />
+            <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Router>
+      </LoyaltyProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
