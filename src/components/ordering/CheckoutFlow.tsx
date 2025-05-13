@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOrder } from '@/context/OrderContext';
@@ -426,9 +425,13 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose }) => {
                     </div>
                   </div>
                   
-                  {/* Loyalty points earned */}
+                  {/* Loyalty points earned - Fixed prop name from pointsEarned to points */}
                   <div className="mb-8">
-                    <LoyaltyPointsEarned pointsEarned={pointsEarned} />
+                    <LoyaltyPointsEarned 
+                      points={pointsEarned} 
+                      newTotal={loyalty.currentPoints + pointsEarned} 
+                      message="You earned loyalty points with your order!"
+                    />
                   </div>
                 </motion.div>
               )}
