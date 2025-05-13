@@ -400,11 +400,26 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     }));
   };
 
-  const nextStep = () => {
+  // Updated navigation functions with loading state
+  const nextStep = async () => {
+    // Trigger loading state in BookingFlow component via event
+    const event = new CustomEvent('booking-transition-start');
+    window.dispatchEvent(event);
+    
+    // Small delay to allow animation
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     setBooking(prev => ({ ...prev, step: prev.step + 1 }));
   };
 
-  const prevStep = () => {
+  const prevStep = async () => {
+    // Trigger loading state in BookingFlow component via event
+    const event = new CustomEvent('booking-transition-start');
+    window.dispatchEvent(event);
+    
+    // Small delay to allow animation
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     setBooking(prev => ({ ...prev, step: Math.max(0, prev.step - 1) }));
   };
 

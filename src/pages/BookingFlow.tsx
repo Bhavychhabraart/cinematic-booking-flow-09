@@ -15,6 +15,7 @@ import BookingStepFour from '@/components/BookingStepFour';
 import BookingStepFive from '@/components/BookingStepFive';
 import { toast } from "@/components/ui/sonner";
 import { vibrate, vibrationPatterns, provideFeedback } from '@/utils/feedback';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 // Determine the maximum number of steps based on booking type
 const getMaxSteps = (bookingType: string): number => {
@@ -42,6 +43,7 @@ const BookingSteps = () => {
   const navigate = useNavigate();
   const venue = getVenueBySlug(venueName || '');
   const maxSteps = getMaxSteps(booking.bookingType);
+  const [isLoading, setIsLoading] = useState(false);
   
   useEffect(() => {
     if (!venue) {
@@ -115,6 +117,17 @@ const BookingSteps = () => {
     return <BookingStepFive key="step5" />;
   };
 
+  // Page transition handler
+  const handleStepTransition = async () => {
+    setIsLoading(true);
+    
+    // Create a small delay for the loading state to be visible
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    setIsLoading(false);
+    return true;
+  };
+
   return (
     <div className="min-h-screen pt-20 my-0 px-0 py-[47px]">
       <div className="container-center mb-10">
@@ -125,20 +138,32 @@ const BookingSteps = () => {
       </div>
       
       <AnimatePresence mode="wait">
-        <motion.div
-          key={booking.step}
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -100 }}
-          transition={{ duration: 0.5 }}
-          onAnimationComplete={() => {
-            if (booking.step > 0) {
-              provideFeedback('subtle');
-            }
-          }}
-        >
-          {renderBookingStep()}
-        </motion.div>
+        {isLoading ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex justify-center items-center min-h-[400px]"
+          >
+            <LoadingSpinner size="lg" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key={booking.step}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            onAnimationComplete={() => {
+              if (booking.step > 0) {
+                provideFeedback('subtle');
+              }
+            }}
+          >
+            {renderBookingStep()}
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );

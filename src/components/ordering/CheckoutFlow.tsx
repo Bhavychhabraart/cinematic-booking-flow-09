@@ -11,6 +11,7 @@ import { provideFeedback, vibrationPatterns, playSound, sounds } from '@/utils/f
 import { X, ChevronLeft, ChevronRight, Clock, BadgeCheck, CreditCard, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import LoyaltyPointsEarned from '../LoyaltyPointsEarned';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 type CheckoutFlowProps = {
   onClose: () => void;
@@ -386,6 +387,20 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose }) => {
                 </motion.div>
               )}
               
+              {/* Processing State */}
+              {isProcessing && (
+                <motion.div
+                  key="processing"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-center justify-center py-20"
+                >
+                  <LoadingSpinner size="lg" className="mb-4" />
+                  <p className="text-white/70">Processing your order...</p>
+                </motion.div>
+              )}
+              
               {/* Confirmation Step */}
               {processComplete && (
                 <motion.div
@@ -440,18 +455,13 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose }) => {
           
           {/* Footer */}
           <div className="p-6 border-t border-white/10 sticky bottom-0 bg-black">
-            {!processComplete && (
+            {!processComplete && !isProcessing && (
               <Button
                 className="w-full bg-burntOrange hover:bg-burntOrange/90 text-black font-bold py-6 flex items-center justify-center"
                 onClick={handleNextStep}
                 disabled={isProcessing}
               >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                    Processing...
-                  </>
-                ) : checkoutStep === 'cart' ? (
+                {checkoutStep === 'cart' ? (
                   <>
                     Continue to Details
                     <ChevronRight className="ml-2 h-5 w-5" />
