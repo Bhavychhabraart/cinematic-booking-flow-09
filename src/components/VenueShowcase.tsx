@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type ShowcaseImage = {
   id: string;
@@ -35,17 +36,16 @@ const demoImages: ShowcaseImage[] = [
 
 interface VenueShowcaseProps {
   images?: ShowcaseImage[];
-  venueSlug?: string;  // Added venueSlug prop
+  venueSlug?: string;
 }
 
 const VenueShowcase = ({ images = demoImages, venueSlug }: VenueShowcaseProps) => {
-  // You can use venueSlug to fetch venue-specific images if needed
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="w-full mb-10"
+      transition={{ duration: 0.6, ease: "easeInOut" }}
+      className="w-full"
     >
       <Carousel
         opts={{
@@ -54,24 +54,28 @@ const VenueShowcase = ({ images = demoImages, venueSlug }: VenueShowcaseProps) =
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2 md:-ml-4">
+        <CarouselContent className="-ml-0 md:-ml-0">
           {images.map((image) => (
-            <CarouselItem key={image.id} className="pl-2 md:pl-4 md:basis-2/3 lg:basis-1/2">
-              <div className="overflow-hidden rounded-lg">
-                <AspectRatio ratio={2/1} className="bg-muted">
+            <CarouselItem key={image.id} className="pl-0 md:pl-0 basis-full md:basis-full lg:basis-full">
+              <div className="overflow-hidden">
+                <AspectRatio ratio={21/9} className="bg-transparent">
                   <img
                     src={image.url}
                     alt={image.alt}
-                    className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+                    className="object-cover w-full h-full transition-transform duration-700 hover:scale-105"
                   />
                 </AspectRatio>
               </div>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <div className="flex items-center justify-end gap-2 mt-4">
-          <CarouselPrevious className="relative inset-auto left-0 right-0 translate-y-0 h-8 w-8" />
-          <CarouselNext className="relative inset-auto left-0 right-0 translate-y-0 h-8 w-8" />
+        <div className="absolute bottom-6 right-6 flex items-center space-x-4 bg-black/30 backdrop-blur-sm px-4 py-2">
+          <CarouselPrevious className="relative inset-auto left-0 right-0 translate-y-0 h-8 w-8 bg-transparent border-white/20 hover:bg-white/10">
+            <ChevronLeft className="h-4 w-4" />
+          </CarouselPrevious>
+          <CarouselNext className="relative inset-auto left-0 right-0 translate-y-0 h-8 w-8 bg-transparent border-white/20 hover:bg-white/10">
+            <ChevronRight className="h-4 w-4" />
+          </CarouselNext>
         </div>
       </Carousel>
     </motion.div>

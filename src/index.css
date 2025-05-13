@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 7%;
 
-    --primary: 21 76% 31%; /* Changed from 47 100% 50% (yellow gold) to 21 76% 31% (burnt orange) */
+    --primary: 21 76% 31%; /* Burnt orange */
     --primary-foreground: 0 0% 7%;
 
     --secondary: 0 0% 96%;
@@ -25,7 +25,7 @@
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 21 76% 31%; /* Changed from 0 0% 96% to burnt orange */
+    --accent: 21 76% 31%; /* Burnt orange */
     --accent-foreground: 0 0% 7%;
 
     --destructive: 0 85% 60%;
@@ -35,7 +35,7 @@
     --input: 0 0% 90%;
     --ring: 0 0% 7%;
 
-    --radius: 0.5rem;
+    --radius: 0; /* Changed from 0.5rem to 0 for straight edges */
   }
 
   .dark {
@@ -48,7 +48,7 @@
     --popover: 0 0% 7%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 21 76% 31%; /* Changed from 47 100% 50% (yellow gold) to 21 76% 31% (burnt orange) */
+    --primary: 21 76% 31%; /* Burnt orange */
     --primary-foreground: 0 0% 7%;
 
     --secondary: 0 0% 15%;
@@ -57,7 +57,7 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 21 76% 31%; /* Changed from 0 0% 15.9% to burnt orange */
+    --accent: 21 76% 31%; /* Burnt orange */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 85% 60%;
@@ -76,32 +76,38 @@
 
   body {
     @apply bg-dark text-white font-montserrat font-light antialiased;
+    letter-spacing: 0.02em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-wide;
+    @apply font-normal tracking-wider;
+    letter-spacing: 0.04em;
   }
   
   h1 {
-    @apply text-4xl sm:text-5xl;
-  }
-  
-  h2 {
     @apply text-3xl sm:text-4xl;
   }
   
-  h3 {
+  h2 {
     @apply text-2xl sm:text-3xl;
+  }
+  
+  h3 {
+    @apply text-xl sm:text-2xl;
+  }
+
+  p {
+    @apply font-light leading-relaxed;
   }
 }
 
 @layer components {
   .booking-pill {
-    @apply px-6 py-3 rounded-full bg-transparent border border-burntOrange text-white hover:bg-burntOrange hover:text-dark transition-all duration-300 font-medium tracking-wide text-center;
+    @apply px-5 py-2.5 border border-burntOrange text-white hover:bg-burntOrange hover:text-dark transition-all duration-300 font-light tracking-wide text-center;
   }
   
   .booking-button {
-    @apply px-8 py-3 bg-burntOrange text-dark rounded-sm hover:translate-y-[-1px] transition-all duration-200 font-medium tracking-wider uppercase;
+    @apply px-6 py-2.5 bg-burntOrange text-dark hover:translate-y-[-1px] transition-all duration-200 font-normal tracking-wider uppercase;
   }
   
   .container-center {
@@ -127,7 +133,7 @@
       transform: translateX(-100%);
     }
     50% {
-      opacity: 0.5;
+      opacity: 0.3;
     }
     100% {
       opacity: 0;
@@ -136,6 +142,23 @@
   }
 
   .animate-holo {
-    animation: holo 3s ease-in-out infinite;
+    animation: holo 4s ease-in-out infinite;
+  }
+  
+  /* Luxury UI Classes */
+  .luxury-container {
+    @apply px-6 py-10 md:px-10 md:py-16;
+  }
+  
+  .luxury-divider {
+    @apply h-px bg-white/10 w-full my-8;
+  }
+  
+  .luxury-card {
+    @apply border-0 bg-black/40 backdrop-blur-sm p-8;
+  }
+  
+  .luxury-input {
+    @apply bg-transparent border border-white/10 px-4 py-3 outline-none focus:border-burntOrange transition-colors duration-300;
   }
 }

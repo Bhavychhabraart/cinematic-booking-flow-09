@@ -57,8 +57,8 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				gold: '#914110', // Changed from #FFD700 to burnt orange
-				burntOrange: '#914110', // Added burnt orange color
+				gold: '#914110', // Burnt orange
+				burntOrange: '#914110', // Burnt orange
 				dark: '#111111',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -73,8 +73,12 @@ export default {
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				md: 'calc(var(--radius) - 0px)',
+				sm: 'calc(var(--radius) - 0px)'
+			},
+			spacing: {
+				'section': '6rem',
+				'element': '2rem',
 			},
 			keyframes: {
 				'accordion-down': {
@@ -114,12 +118,16 @@ export default {
 					'100%': { opacity: '1' }
 				},
 				'pulse-gold': {
-					'0%, 100%': { boxShadow: '0 0 0 0 rgba(145, 65, 16, 0.4)' }, // Updated to burnt orange
-					'50%': { boxShadow: '0 0 0 10px rgba(145, 65, 16, 0)' } // Updated to burnt orange
+					'0%, 100%': { boxShadow: '0 0 0 0 rgba(145, 65, 16, 0.2)' },
+					'50%': { boxShadow: '0 0 0 10px rgba(145, 65, 16, 0)' }
 				},
 				'float-up': {
 					'0%': { transform: 'translateY(0)', opacity: '1' },
 					'100%': { transform: 'translateY(-20px)', opacity: '0' }
+				},
+				'subtle-glow': {
+					'0%, 100%': { opacity: '0.4' },
+					'50%': { opacity: '0.8' }
 				}
 			},
 			animation: {
@@ -130,8 +138,9 @@ export default {
 				'slide-from-right': 'slide-from-right 0.5s ease-out',
 				'slide-to-left': 'slide-to-left 0.5s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
-				'pulse-gold': 'pulse-gold 2s infinite',
-				'float-up': 'float-up 2s ease-out forwards'
+				'pulse-gold': 'pulse-gold 3s infinite',
+				'float-up': 'float-up 2s ease-out forwards',
+				'subtle-glow': 'subtle-glow 3s infinite'
 			}
 		}
 	},
