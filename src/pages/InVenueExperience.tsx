@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Wifi, Bell, Star, Menu as MenuIcon, CreditCard, MessageSquare } from 'lucide-react';
+import { ChevronLeft, Wifi, Bell, Star, Menu as MenuIcon, CreditCard, MessageSquare, QrCode } from 'lucide-react';
 import { getVenueBySlug } from '@/data/venues';
 import { provideFeedback, vibrationPatterns, sounds } from '@/utils/feedback';
 import { Card, CardContent } from '@/components/ui/card';
@@ -114,6 +113,13 @@ const InVenueExperience: React.FC = () => {
       color: 'bg-rose-500 hover:bg-rose-600',
       action: () => setActiveDialog('feedback')
     },
+    {
+      id: 'coupons',
+      label: 'Drink Coupons',
+      icon: <QrCode size={36} />,
+      color: 'bg-indigo-500 hover:bg-indigo-600',
+      action: () => navigate(`/coupons/${venueName}`)
+    }
   ];
 
   return (
