@@ -29,6 +29,20 @@ const Index = () => {
         >
           Premium booking for exceptional venues
         </motion.p>
+        
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.7 }}
+          className="mt-6"
+        >
+          <Link 
+            to="/venues-landing" 
+            className="inline-block px-6 py-3 bg-burntOrange text-dark rounded-sm hover:translate-y-[-1px] transition-all duration-200 font-medium tracking-wider uppercase"
+          >
+            Venue Owners - Learn More
+          </Link>
+        </motion.div>
       </div>
       
       <motion.div 
@@ -80,7 +94,7 @@ const Index = () => {
         className="mt-16 text-center"
       >
         <p className="text-white/50 text-sm">
-          Are you a venue owner? <Link to="/owner-dashboard" className="text-gold hover:underline">Login</Link>
+          Are you a venue owner? <Link to="/owner-dashboard" className="text-gold hover:underline">Login</Link> or <Link to="/venues-landing" className="text-gold hover:underline">Learn More</Link>
         </p>
       </motion.div>
     </motion.div>

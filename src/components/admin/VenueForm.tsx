@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,7 +24,8 @@ import {
 } from '@/components/ui/select';
 import { Venue } from '@/data/venues';
 
-const formSchema = z.object({
+// Define the correct schema that ensures tags and amenities are always arrays
+export const venueSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   slug: z.string().min(2, { message: "Slug must be at least 2 characters" }).regex(/^[a-z0-9-]+$/, {
     message: "Slug must contain only lowercase letters, numbers, and hyphens",
@@ -44,20 +44,26 @@ const formSchema = z.object({
     sunday: z.string().min(1, { message: "Please specify Sunday hours" })
   }),
   dressCode: z.string().optional(),
-  tags: z.string().transform(val => val ? val.split(',').map(tag => tag.trim()) : []).optional(),
-  amenities: z.string().transform(val => val ? val.split(',').map(amenity => amenity.trim()) : []).optional(),
+  tags: z.union([
+    z.string().transform(val => val ? val.split(',').map(tag => tag.trim()) : []),
+    z.array(z.string())
+  ]),
+  amenities: z.union([
+    z.string().transform(val => val ? val.split(',').map(amenity => amenity.trim()) : []),
+    z.array(z.string())
+  ]),
 });
 
 type VenueFormProps = {
-  onSubmit: (data: z.infer<typeof formSchema>) => void;
+  onSubmit: (data: z.infer<typeof venueSchema>) => void;
   initialValues?: Partial<Venue>;
 };
 
 const VenueForm = ({ onSubmit, initialValues }: VenueFormProps) => {
   const { toast } = useToast();
   
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof venueSchema>>({
+    resolver: zodResolver(venueSchema),
     defaultValues: {
       name: initialValues?.name || '',
       slug: initialValues?.slug || '',
@@ -86,7 +92,7 @@ const VenueForm = ({ onSubmit, initialValues }: VenueFormProps) => {
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = (values: z.infer<typeof venueSchema>) => {
     try {
       onSubmit(values);
       toast({
@@ -358,5 +364,7 @@ const VenueForm = ({ onSubmit, initialValues }: VenueFormProps) => {
     </Form>
   );
 };
+
+export type VenueFormValues = z.infer<typeof venueSchema>;
 
 export default VenueForm;

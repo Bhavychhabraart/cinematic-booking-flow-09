@@ -17,6 +17,7 @@ import TableOrderingPage from "./pages/TableOrderingPage";
 import InVenueCouponPage from "./pages/InVenueCouponPage";
 import { OrderProvider } from "./context/OrderContext";
 import TableManagementPage from "./pages/TableManagement";
+import VenuesLanding from "./pages/VenuesLanding";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/table-management" element={<TableManagementPage />} />
               <Route path="/order/:venueName" element={<TableOrderingPage />} />
               <Route path="/coupons/:venueName" element={<InVenueCouponPage />} />
+              <Route path="/venues-landing" element={<VenuesLanding />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
