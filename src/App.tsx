@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import LoyaltyPage from "./pages/LoyaltyPage";
 import { LoyaltyProvider } from "./context/LoyaltyContext";
+import InVenueExperience from "./pages/InVenueExperience";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/book/:venueName" element={<BookingFlow />} />
             <Route path="/loyalty" element={<LoyaltyPage />} />
             <Route path="/loyalty/:venueName" element={<LoyaltyPage />} />
+            <Route path="/venue-experience/:venueName" element={<InVenueExperience />} />
             <Route path="/owner-dashboard" element={<OwnerDashboard />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="*" element={<NotFound />} />

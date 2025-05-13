@@ -4,10 +4,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Smartphone } from 'lucide-react';
 import { getVenueBySlug } from '@/data/venues';
 import VenueShowcase from '@/components/VenueShowcase';
 import LoyaltyPreview from '@/components/LoyaltyPreview';
+import { provideFeedback, vibrationPatterns } from '@/utils/feedback';
 
 const VenuePage: React.FC = () => {
   const { venueName } = useParams();
@@ -18,6 +19,11 @@ const VenuePage: React.FC = () => {
     navigate('/');
     return null;
   }
+
+  const handleExperienceClick = () => {
+    provideFeedback('buttonPress');
+    navigate(`/venue-experience/${venueName}`);
+  };
 
   return (
     <div className="pb-20">
@@ -60,13 +66,25 @@ const VenuePage: React.FC = () => {
               <p className="text-white/70">{venue.city || 'City'}, {venue.zipCode || 'Zip code'}</p>
             </div>
 
-            <Button
-              onClick={() => navigate(`/book/${venueName}`)}
-              size="lg"
-              className="booking-button"
-            >
-              Make a Reservation
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleExperienceClick}
+                variant="outline"
+                size="lg"
+                className="flex items-center gap-2"
+              >
+                <Smartphone className="h-5 w-5" />
+                <span>In-Venue Experience</span>
+              </Button>
+            
+              <Button
+                onClick={() => navigate(`/book/${venueName}`)}
+                size="lg"
+                className="booking-button"
+              >
+                Make a Reservation
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -95,8 +113,8 @@ const VenuePage: React.FC = () => {
               <h3 className="font-bold mb-2">Amenities</h3>
               <ul className="grid grid-cols-2 gap-2">
                 {venue.amenities?.map((amenity, index) => (
-                  <li key={index} className="text-white/70 flex items-center">
-                    <span className="w-1.5 h-1.5 bg-[#914110] rounded-full mr-2"></span>
+                  <li key={index} className="text-white/70 flex items-start">
+                    <span className="inline-block w-1.5 h-1.5 bg-[#914110] rounded-full mr-2"></span>
                     <span>{amenity}</span>
                   </li>
                 ))}
