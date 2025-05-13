@@ -263,12 +263,6 @@ const VenuePage = () => {
             </div>
           </div>
         </div>
-
-        {/* Featured showcase carousel in the hero section */}
-        <div className="absolute bottom-32 left-0 right-0 z-20 px-4">
-          <VenueShowcase />
-        </div>
-        
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-12 z-20">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
