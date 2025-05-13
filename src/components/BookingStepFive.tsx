@@ -1,14 +1,13 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Download, Receipt } from 'lucide-react';
+import { CheckCircle, Download, Receipt, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBooking } from '@/context/BookingContext';
 import { format } from 'date-fns';
 import { toast } from "@/components/ui/sonner";
 import { vibrate, vibrationPatterns, playSound, sounds } from '@/utils/feedback';
-import { formatCurrency } from '@/utils/formatters';
+import { formatCurrency, generateVoucherCode } from '@/utils/formatters';
 
 const generateQR = (data: string) => {
   // Mock function to "generate" a QR code
@@ -84,12 +83,20 @@ const Bubble = ({ delay }: { delay: number }) => {
   );
 };
 
+interface Voucher {
+  code: string;
+  discountAmount: number;
+  expiryDate: Date;
+}
+
 const BookingStepFive: React.FC = () => {
   const navigate = useNavigate();
   const { venueName } = useParams();
   const { booking, resetBooking, getPriceBreakdown } = useBooking();
   const [bubbles, setBubbles] = useState<number[]>([]);
   const [qrCode, setQrCode] = useState<{ qrData: boolean[][]; size: number; cellSize: number } | null>(null);
+  const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [showVouchers, setShowVouchers] = useState(false);
   
   const { total, appliedCoupon } = getPriceBreakdown();
   
@@ -121,6 +128,30 @@ const BookingStepFive: React.FC = () => {
       setQrCode(generateQR(bookingData));
     }
     
+    // Generate 5 vouchers for future visits
+    const newVouchers: Voucher[] = [];
+    const discounts = [10, 15, 20, 25, 30]; // Percentage discounts
+    
+    // Create expiry date (3 months from now)
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 3);
+    
+    // Generate vouchers
+    for (let i = 0; i < 5; i++) {
+      newVouchers.push({
+        code: generateVoucherCode(),
+        discountAmount: discounts[i],
+        expiryDate: new Date(expiryDate)
+      });
+    }
+    
+    setVouchers(newVouchers);
+    
+    // Show vouchers after a short delay to focus on booking confirmation first
+    setTimeout(() => {
+      setShowVouchers(true);
+    }, 1500);
+    
     return () => clearInterval(intervalId);
   }, [booking, venueName]);
   
@@ -130,6 +161,13 @@ const BookingStepFive: React.FC = () => {
     
     // In a real application, you would generate and download an actual QR code
     toast.success("Booking QR code saved to your device");
+  };
+  
+  const handleCopyVoucher = (voucherCode: string) => {
+    // Copy voucher code to clipboard
+    navigator.clipboard.writeText(voucherCode);
+    vibrate(vibrationPatterns.subtle);
+    toast.success("Voucher code copied to clipboard!");
   };
   
   const handleDone = () => {
@@ -250,15 +288,60 @@ const BookingStepFive: React.FC = () => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 1.4 }}
-        className="text-white/60 text-sm mb-8"
+        className="text-white/60 text-sm mb-6"
       >
         A confirmation email with your booking details has been sent to your email address.
       </motion.p>
       
+      {/* Vouchers Section */}
+      {showVouchers && (
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 1.6 }}
+          className="mb-8 max-w-xs mx-auto"
+        >
+          <div className="flex items-center justify-center gap-2 mb-3 text-[#914110]">
+            <Gift className="h-5 w-5" />
+            <h3 className="font-medium">Your VIP Vouchers</h3>
+          </div>
+          
+          <p className="text-white/70 text-sm mb-4">
+            We've added 5 special vouchers to your account. Use them on your next visits!
+          </p>
+          
+          <div className="space-y-2">
+            {vouchers.map((voucher, index) => (
+              <motion.div 
+                key={voucher.code}
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 1.8 + (index * 0.1) }}
+                className="flex items-center justify-between bg-gradient-to-r from-[#151515] to-[#1f1f1f] p-3 rounded-lg border border-[#914110]/20 text-left"
+                onClick={() => handleCopyVoucher(voucher.code)}
+              >
+                <div>
+                  <div className="font-mono text-sm text-white/90">{voucher.code}</div>
+                  <div className="text-xs text-white/60">
+                    Expires: {format(voucher.expiryDate, 'MMM d, yyyy')}
+                  </div>
+                </div>
+                <div className="text-[#914110] font-medium">
+                  {voucher.discountAmount}% OFF
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <p className="text-white/50 text-xs mt-2">
+            Click on a voucher to copy its code
+          </p>
+        </motion.div>
+      )}
+      
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 1.6 }}
+        transition={{ delay: showVouchers ? 2.2 : 1.6 }}
       >
         <Button onClick={handleDone} className="booking-button">
           Done
