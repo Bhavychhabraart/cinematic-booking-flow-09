@@ -107,3 +107,27 @@ export const venues: Venue[] = [
 export const getVenueBySlug = (slug: string): Venue | undefined => {
   return venues.find(venue => venue.slug === slug);
 };
+
+// This would be replaced with an actual API call in a real application
+export const createVenue = (venueData: Omit<Venue, 'id'>): Venue => {
+  const newVenue: Venue = {
+    ...venueData,
+    id: (venues.length + 1).toString()
+  };
+  
+  // In a real application, this would persist to a database
+  // Here we're just adding it to the array in memory for demonstration
+  venues.push(newVenue);
+  
+  return newVenue;
+};
+
+export const updateVenue = (id: string, venueData: Partial<Venue>): Venue | undefined => {
+  const index = venues.findIndex(venue => venue.id === id);
+  if (index === -1) return undefined;
+  
+  const updatedVenue = { ...venues[index], ...venueData };
+  venues[index] = updatedVenue;
+  
+  return updatedVenue;
+};

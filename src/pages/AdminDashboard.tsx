@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
@@ -21,11 +20,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReportGenerator from '@/components/admin/ReportGenerator';
 import VenueGPT from '@/components/admin/VenueGPT';
+import CreateVenue from '@/components/admin/CreateVenue';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [showCreateVenue, setShowCreateVenue] = useState(false);
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -55,7 +56,10 @@ const AdminDashboard = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => setActiveTab("venues")} 
+                  onClick={() => {
+                    setActiveTab("venues");
+                    setShowCreateVenue(false);
+                  }} 
                   className={`block w-full text-left py-2 px-4 transition-all ${activeTab === "venues" ? "text-white border-l-2 border-gold" : "text-white/60 hover:text-white hover:border-l-2 hover:border-gold/50"}`}
                 >
                   Venues
@@ -172,7 +176,8 @@ const AdminDashboard = () => {
         
         <main className="p-6 sm:p-10">
           {activeTab === "dashboard" && <DashboardContent />}
-          {activeTab === "venues" && <VenuesContent />}
+          {activeTab === "venues" && !showCreateVenue && <VenuesContent onCreateNew={() => setShowCreateVenue(true)} />}
+          {activeTab === "venues" && showCreateVenue && <CreateVenue onBack={() => setShowCreateVenue(false)} />}
           {activeTab === "bookings" && <BookingsContent />}
           {activeTab === "reports" && <ReportGenerator />}
           {activeTab === "venuegpt" && <VenueGPT />}
@@ -343,8 +348,8 @@ const DashboardContent = () => (
   </>
 );
 
-// Venues content (reusing existing implementation)
-const VenuesContent = () => (
+// Venues content (updated with create button handler)
+const VenuesContent = ({ onCreateNew }: { onCreateNew: () => void }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -353,7 +358,7 @@ const VenuesContent = () => (
   >
     <div className="flex justify-between items-center mb-6">
       <h2 className="text-xl font-medium tracking-wide">Venues Management</h2>
-      <Button variant="outline" className="flex items-center gap-2">
+      <Button variant="outline" className="flex items-center gap-2" onClick={onCreateNew}>
         <Plus size={18} /> Add Venue
       </Button>
     </div>
