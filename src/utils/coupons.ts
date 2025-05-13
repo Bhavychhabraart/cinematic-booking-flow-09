@@ -45,21 +45,22 @@ export function recordCouponClaim(phoneNumber: string): void {
   if (!phoneRedemptions[phoneNumber]) {
     // First time claim today
     phoneRedemptions[phoneNumber] = {
-      count: 3,
+      count: 1,
       date: today
     };
+    console.log(`First claim for ${phoneNumber}: ${phoneRedemptions[phoneNumber].count} coupon on ${today}`);
   } else if (phoneRedemptions[phoneNumber].date === today) {
     // Add to existing count for today
-    phoneRedemptions[phoneNumber].count += 3;
+    phoneRedemptions[phoneNumber].count += 1;
+    console.log(`Additional claim for ${phoneNumber}: now has ${phoneRedemptions[phoneNumber].count} coupons on ${today}`);
   } else {
     // New day, reset count
     phoneRedemptions[phoneNumber] = {
-      count: 3,
+      count: 1,
       date: today
     };
+    console.log(`New day claim for ${phoneNumber}: ${phoneRedemptions[phoneNumber].count} coupon on ${today}`);
   }
-  
-  console.log(`Recorded claim for ${phoneNumber}: ${phoneRedemptions[phoneNumber].count} coupons on ${today}`);
 }
 
 // Get remaining coupons for a user today

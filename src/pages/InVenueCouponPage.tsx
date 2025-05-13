@@ -74,10 +74,12 @@ const InVenueCouponPage: React.FC = () => {
       phone: "",
       drinkChoice: undefined,
     },
+    mode: "onChange", // Enable validation as fields change
   });
 
   // Handle verification of user info
   const handleVerifyInfo = (values: FormValues) => {
+    console.log("Verifying info:", values);
     provideFeedback('success', sounds.success);
     
     // Check if user has already claimed coupons today
@@ -95,6 +97,7 @@ const InVenueCouponPage: React.FC = () => {
 
   // Handle submission of drink choice
   const handleDrinkSubmit = (values: FormValues) => {
+    console.log("Drink choice submitted:", values);
     provideFeedback('celebratory', sounds.victory);
     
     // Record this claim
@@ -325,7 +328,7 @@ const InVenueCouponPage: React.FC = () => {
               <div className="space-y-4 my-6">
                 {coupons.map((coupon, index) => (
                   <motion.div 
-                    key={`coupon-${index}-${coupon}`}
+                    key={coupon}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.2 }}
