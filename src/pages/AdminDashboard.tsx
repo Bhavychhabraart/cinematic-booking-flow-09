@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { venues } from '@/data/venues';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, Users, BookOpen, Music, Calendar, Plus, MessageSquare, Bell, FileText, Bot } from 'lucide-react';
+import { Menu, X, Users, BookOpen, Music, Calendar, Plus, MessageSquare, Bell, FileText, Bot, TableIcon } from 'lucide-react';
 import { 
   Sheet,
   SheetContent,
@@ -30,6 +30,10 @@ const AdminDashboard = () => {
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleTableManagementClick = () => {
+    navigate('/table-management');
   };
 
   return (
@@ -71,6 +75,14 @@ const AdminDashboard = () => {
                   className={`block w-full text-left py-2 px-4 transition-all ${activeTab === "bookings" ? "text-white border-l-2 border-gold" : "text-white/60 hover:text-white hover:border-l-2 hover:border-gold/50"}`}
                 >
                   Bookings
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={handleTableManagementClick} 
+                  className={`block w-full text-left py-2 px-4 transition-all text-white/60 hover:text-white hover:border-l-2 hover:border-gold/50`}
+                >
+                  Table Management
                 </button>
               </li>
               <li>

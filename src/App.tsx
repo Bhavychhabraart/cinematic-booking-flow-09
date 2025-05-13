@@ -16,6 +16,7 @@ import InVenueExperience from "./pages/InVenueExperience";
 import TableOrderingPage from "./pages/TableOrderingPage";
 import InVenueCouponPage from "./pages/InVenueCouponPage";
 import { OrderProvider } from "./context/OrderContext";
+import TableManagementPage from "./pages/TableManagement";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/venue-experience/:venueName" element={<InVenueExperience />} />
               <Route path="/owner-dashboard" element={<OwnerDashboard />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/table-management" element={<TableManagementPage />} />
               <Route path="/order/:venueName" element={<TableOrderingPage />} />
               <Route path="/coupons/:venueName" element={<InVenueCouponPage />} />
               <Route path="*" element={<NotFound />} />

@@ -44,8 +44,8 @@ const formSchema = z.object({
     sunday: z.string().min(1, { message: "Please specify Sunday hours" })
   }),
   dressCode: z.string().optional(),
-  tags: z.string().transform(val => val.split(',').map(tag => tag.trim())).optional(),
-  amenities: z.string().transform(val => val.split(',').map(amenity => amenity.trim())).optional(),
+  tags: z.string().transform(val => val ? val.split(',').map(tag => tag.trim()) : []).optional(),
+  amenities: z.string().transform(val => val ? val.split(',').map(amenity => amenity.trim()) : []).optional(),
 });
 
 type VenueFormProps = {
