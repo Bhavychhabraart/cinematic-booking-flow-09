@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type ShowcaseImage = {
   id: string;
@@ -40,44 +40,94 @@ interface VenueShowcaseProps {
 }
 
 const VenueShowcase = ({ images = demoImages, venueSlug }: VenueShowcaseProps) => {
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+  
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) => prevIndex === 0 ? images.length - 1 : prevIndex - 1);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeInOut" }}
-      className="w-full"
+      transition={{ duration: 0.8, ease: "easeInOut" }}
+      className="w-full h-full relative overflow-hidden"
     >
-      <Carousel
-        opts={{
-          align: "start",
-          loop: true,
-        }}
-        className="w-full"
+      <div className="absolute inset-0 bg-black/40 z-10"></div>
+      
+      {/* Full screen image */}
+      <motion.div 
+        key={currentIndex}
+        initial={{ opacity: 0.5 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="h-full w-full"
       >
-        <CarouselContent className="-ml-0 md:-ml-0">
-          {images.map((image) => (
-            <CarouselItem key={image.id} className="pl-0 md:pl-0 basis-full md:basis-full lg:basis-full">
-              <div className="overflow-hidden">
-                <AspectRatio ratio={21/9} className="bg-transparent">
-                  <img
-                    src={image.url}
-                    alt={image.alt}
-                    className="object-cover w-full h-full transition-transform duration-700 hover:scale-105"
-                  />
-                </AspectRatio>
-              </div>
-            </CarouselItem>
+        <img
+          src={images[currentIndex].url}
+          alt={images[currentIndex].alt}
+          className="object-cover w-full h-full"
+        />
+      </motion.div>
+      
+      {/* Content overlay */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 p-8 md:p-16 bg-gradient-to-t from-black/80 to-transparent">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.7 }}
+        >
+          <div className="flex flex-col gap-2">
+            <h1 className="text-5xl md:text-7xl font-light tracking-wider text-white mb-2">{venueSlug}</h1>
+            <h2 className="text-xl md:text-2xl font-extralight tracking-widest text-white/80 uppercase mb-8">
+              {venueSlug === 'mirage' ? 'nightclub' : venueSlug === 'aurelia' ? 'restaurant' : 'venue'}
+            </h2>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="self-start px-12 py-4 bg-burntOrange text-dark text-base uppercase tracking-wider font-normal"
+            >
+              Book Now
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
+      
+      {/* Navigation controls */}
+      <div className="absolute bottom-8 right-8 flex items-center space-x-6 z-30">
+        <motion.button 
+          whileHover={{ scale: 1.1 }} 
+          whileTap={{ scale: 0.9 }}
+          onClick={prevSlide}
+          className="text-white/80 hover:text-white focus:outline-none"
+        >
+          <ChevronLeft className="h-8 w-8" />
+        </motion.button>
+        <div className="flex space-x-2">
+          {images.map((_, idx) => (
+            <div 
+              key={idx}
+              className={cn(
+                "h-[2px] w-6 transition-all duration-300",
+                idx === currentIndex ? "bg-white" : "bg-white/40"
+              )}
+            />
           ))}
-        </CarouselContent>
-        <div className="absolute bottom-6 right-6 flex items-center space-x-4 bg-black/30 backdrop-blur-sm px-4 py-2">
-          <CarouselPrevious className="relative inset-auto left-0 right-0 translate-y-0 h-8 w-8 bg-transparent border-white/20 hover:bg-white/10">
-            <ChevronLeft className="h-4 w-4" />
-          </CarouselPrevious>
-          <CarouselNext className="relative inset-auto left-0 right-0 translate-y-0 h-8 w-8 bg-transparent border-white/20 hover:bg-white/10">
-            <ChevronRight className="h-4 w-4" />
-          </CarouselNext>
         </div>
-      </Carousel>
+        <motion.button 
+          whileHover={{ scale: 1.1 }} 
+          whileTap={{ scale: 0.9 }}
+          onClick={nextSlide}
+          className="text-white/80 hover:text-white focus:outline-none"
+        >
+          <ChevronRight className="h-8 w-8" />
+        </motion.button>
+      </div>
     </motion.div>
   );
 };
