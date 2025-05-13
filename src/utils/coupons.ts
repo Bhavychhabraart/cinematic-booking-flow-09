@@ -29,9 +29,10 @@ export function hasClaimedToday(phoneNumber: string): boolean {
   
   if (
     phoneRedemptions[phoneNumber] && 
-    phoneRedemptions[phoneNumber].date === today
+    phoneRedemptions[phoneNumber].date === today &&
+    phoneRedemptions[phoneNumber].count >= 3
   ) {
-    return phoneRedemptions[phoneNumber].count >= 3;
+    return true;
   }
   
   return false;
@@ -42,11 +43,13 @@ export function recordCouponClaim(phoneNumber: string): void {
   const today = new Date().toISOString().split('T')[0];
   
   if (!phoneRedemptions[phoneNumber]) {
+    // First time claim today
     phoneRedemptions[phoneNumber] = {
       count: 3,
       date: today
     };
   } else if (phoneRedemptions[phoneNumber].date === today) {
+    // Add to existing count for today
     phoneRedemptions[phoneNumber].count += 3;
   } else {
     // New day, reset count
