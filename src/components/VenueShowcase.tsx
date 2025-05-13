@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +54,7 @@ const VenueShowcase = ({ images = demoImages, venueSlug }: VenueShowcaseProps) =
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
-      className="w-full h-full relative overflow-hidden"
+      className="w-full h-[80vh] relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-black/40 z-10"></div>
       
@@ -82,51 +81,53 @@ const VenueShowcase = ({ images = demoImages, venueSlug }: VenueShowcaseProps) =
           transition={{ delay: 0.3, duration: 0.7 }}
         >
           <div className="flex flex-col gap-2">
-            <h1 className="text-5xl md:text-7xl font-light tracking-wider text-white mb-2">{venueSlug}</h1>
+            <h1 className="text-5xl md:text-6xl font-light tracking-wider text-white mb-2">{venueSlug}</h1>
             <h2 className="text-xl md:text-2xl font-extralight tracking-widest text-white/80 uppercase mb-8">
               {venueSlug === 'mirage' ? 'nightclub' : venueSlug === 'aurelia' ? 'restaurant' : 'venue'}
             </h2>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-              className="self-start px-12 py-4 bg-burntOrange text-dark text-base uppercase tracking-wider font-normal"
-            >
-              Book Now
-            </motion.button>
+            <div className="flex justify-between items-center w-full">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+                className="px-8 py-3 bg-burntOrange text-dark text-base uppercase tracking-wider font-normal"
+              >
+                Book Now
+              </motion.button>
+              
+              {/* Navigation controls */}
+              <div className="flex items-center space-x-6">
+                <motion.button 
+                  whileHover={{ scale: 1.1 }} 
+                  whileTap={{ scale: 0.9 }}
+                  onClick={prevSlide}
+                  className="text-white/80 hover:text-white focus:outline-none"
+                >
+                  <ChevronLeft className="h-8 w-8" />
+                </motion.button>
+                <div className="flex space-x-2">
+                  {images.map((_, idx) => (
+                    <div 
+                      key={idx}
+                      className={cn(
+                        "h-[2px] w-6 transition-all duration-300",
+                        idx === currentIndex ? "bg-white" : "bg-white/40"
+                      )}
+                    />
+                  ))}
+                </div>
+                <motion.button 
+                  whileHover={{ scale: 1.1 }} 
+                  whileTap={{ scale: 0.9 }}
+                  onClick={nextSlide}
+                  className="text-white/80 hover:text-white focus:outline-none"
+                >
+                  <ChevronRight className="h-8 w-8" />
+                </motion.button>
+              </div>
+            </div>
           </div>
         </motion.div>
-      </div>
-      
-      {/* Navigation controls */}
-      <div className="absolute bottom-8 right-8 flex items-center space-x-6 z-30">
-        <motion.button 
-          whileHover={{ scale: 1.1 }} 
-          whileTap={{ scale: 0.9 }}
-          onClick={prevSlide}
-          className="text-white/80 hover:text-white focus:outline-none"
-        >
-          <ChevronLeft className="h-8 w-8" />
-        </motion.button>
-        <div className="flex space-x-2">
-          {images.map((_, idx) => (
-            <div 
-              key={idx}
-              className={cn(
-                "h-[2px] w-6 transition-all duration-300",
-                idx === currentIndex ? "bg-white" : "bg-white/40"
-              )}
-            />
-          ))}
-        </div>
-        <motion.button 
-          whileHover={{ scale: 1.1 }} 
-          whileTap={{ scale: 0.9 }}
-          onClick={nextSlide}
-          className="text-white/80 hover:text-white focus:outline-none"
-        >
-          <ChevronRight className="h-8 w-8" />
-        </motion.button>
       </div>
     </motion.div>
   );

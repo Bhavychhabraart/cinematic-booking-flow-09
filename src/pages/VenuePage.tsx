@@ -8,10 +8,67 @@ import { Separator } from '@/components/ui/separator';
 import { ChevronLeft, Smartphone, Utensils, Gift } from 'lucide-react';
 import { getVenueBySlug } from '@/data/venues';
 import VenueShowcase from '@/components/VenueShowcase';
-import LoyaltyPreview from '@/components/LoyaltyPreview';
-import { provideFeedback, vibrationPatterns } from '@/utils/feedback';
+import { provideFeedback } from '@/utils/feedback';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import GiftCardPurchase from '@/components/GiftCardPurchase';
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselPrevious, 
+  CarouselNext 
+} from '@/components/ui/carousel';
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const FeatureCarousel = () => {
+  const [isLoaded, setIsLoaded] = React.useState(false);
+  const images = [
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&q=80",
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&q=80",
+    "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&h=600&q=80",
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&q=80",
+  ];
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  return (
+    <div className="my-12">
+      <h2 className="text-3xl font-light tracking-wider mb-8">Venue Features</h2>
+      <Carousel className="w-full">
+        <CarouselContent>
+          {images.map((src, index) => (
+            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+              <div className="p-1">
+                <AspectRatio ratio={4/3} className="bg-black/20 overflow-hidden">
+                  {!isLoaded ? (
+                    <Skeleton className="w-full h-full" />
+                  ) : (
+                    <img
+                      src={src}
+                      alt={`Feature ${index + 1}`}
+                      className="w-full h-full object-cover transition-all hover:scale-105 duration-700"
+                      onLoad={() => setIsLoaded(true)}
+                    />
+                  )}
+                </AspectRatio>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <div className="flex justify-end gap-2 mt-4">
+          <CarouselPrevious className="static transform-none translate-y-0 h-9 w-9 border-white/20" />
+          <CarouselNext className="static transform-none translate-y-0 h-9 w-9 border-white/20" />
+        </div>
+      </Carousel>
+    </div>
+  );
+};
 
 const VenuePage: React.FC = () => {
   const { venueName } = useParams();
@@ -41,7 +98,7 @@ const VenuePage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="h-screen">
+      <div className="h-auto">
         <VenueShowcase venueSlug={venueName || ''} />
       </div>
 
@@ -49,13 +106,13 @@ const VenuePage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="px-8 md:px-16 py-24 bg-black"
+        className="px-8 md:px-16 py-16 bg-black"
       >
         <div className="max-w-5xl mx-auto">
-          <div className="space-y-16">
+          <div className="space-y-12">
             {/* About Section */}
             <section>
-              <h2 className="text-3xl font-light tracking-wider mb-12">About</h2>
+              <h2 className="text-3xl font-light tracking-wider mb-8">About</h2>
               <p className="text-white/80 text-xl font-light leading-relaxed max-w-3xl mb-10">
                 {venue.description}
               </p>
@@ -72,6 +129,9 @@ const VenuePage: React.FC = () => {
                 ))}
               </div>
             </section>
+            
+            {/* Feature Carousel */}
+            <FeatureCarousel />
             
             <Separator className="bg-white/10" />
             
@@ -114,11 +174,6 @@ const VenuePage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                
-                <div className="mt-16">
-                  <h3 className="font-light text-xl mb-8">Your Loyalty Status</h3>
-                  <LoyaltyPreview venueName={venueName} />
-                </div>
               </div>
             </section>
             
@@ -137,7 +192,7 @@ const VenuePage: React.FC = () => {
                 <Button
                   onClick={handleExperienceClick}
                   variant="outline"
-                  className="bg-transparent border-white/20 hover:bg-white/5 text-sm font-light tracking-wider px-6 py-8 h-auto"
+                  className="bg-transparent border-white/20 hover:bg-white/5 text-sm font-light tracking-wider px-6 py-6 h-auto"
                 >
                   <Smartphone className="h-4 w-4 mr-3" />
                   <span>In-Venue Experience</span>
@@ -146,7 +201,7 @@ const VenuePage: React.FC = () => {
                 <Button
                   onClick={handleOrderClick}
                   variant="outline"
-                  className="bg-transparent border-burntOrange text-burntOrange hover:bg-burntOrange hover:text-white text-sm font-light tracking-wider px-6 py-8 h-auto"
+                  className="bg-transparent border-burntOrange text-burntOrange hover:bg-burntOrange hover:text-white text-sm font-light tracking-wider px-6 py-6 h-auto"
                 >
                   <Utensils className="h-4 w-4 mr-3" />
                   <span>Order Now</span>
@@ -154,7 +209,7 @@ const VenuePage: React.FC = () => {
                 
                 <Button
                   onClick={() => navigate(`/book/${venueName}`)}
-                  className="bg-burntOrange hover:bg-burntOrange/90 text-dark text-sm font-normal tracking-wider px-6 py-8 h-auto"
+                  className="bg-burntOrange hover:bg-burntOrange/90 text-dark text-sm font-normal tracking-wider px-6 py-6 h-auto"
                 >
                   Make a Reservation
                 </Button>
